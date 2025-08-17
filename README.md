@@ -27,6 +27,4 @@ Unlike traditional bots, Lumio is:
 
 Lumio isn’t just a mod bot — it’s a **full community maintainer agent** that helps Web3 and tech communities **grow, stay safe, and thrive long-term** on decentralized infrastructure.
 
----
 
-Do you want me to make this **short and polished for GitHub README top section**, or **long-form with installation + usage** (like a full README template)?

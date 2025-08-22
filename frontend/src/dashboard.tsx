@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,23 +12,70 @@ import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast, Toaster } from "sonner"
 
+// 🟢 Replace this with your friend's backend URL
+const SERVERS_API_URL = "http://localhost:5000/servers"
+
+interface ServerType {
+  id: string
+  name: string
+  description?: string
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const address = useActiveAddress()
+
   const [showForm, setShowForm] = useState(false)
   const [serverName, setServerName] = useState("")
   const [description, setDescription] = useState("")
+  const [servers, setServers] = useState<ServerType[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const handleSave = () => {
-    if (!serverName) {
-      toast.error("Server name is required")
-      return
+  // ✅ Fetch servers from backend on mount
+  useEffect(() => {
+    const fetchServers = async () => {
+      try {
+        const res = await fetch(SERVERS_API_URL)
+        const data = await res.json()
+        setServers(data) // assumes backend sends an array of servers
+      } catch (err) {
+        console.error("Error fetching servers:", err)
+        toast.error("Failed to load servers")
+      } finally {
+        setLoading(false)
+      }
     }
-    const newServer = { name: serverName, description }
-    console.log(JSON.stringify(newServer, null, 2))
-    toast.success("Server created successfully!")
-    navigate("/bot-selection", { state: { serverName } })
+    fetchServers()
+  }, [])
+
+const handleSave = () => {
+  if (!serverName) {
+    toast.error("Server name is required")
+    return
   }
+
+  // ✅ Safe UUID fallback (works everywhere)
+  const generateQuarterUUID = () => {
+    try {
+      return crypto.randomUUID().substring(0, 8) // if available
+    } catch {
+      return Math.random().toString(36).substring(2, 10) // fallback
+    }
+  }
+
+  const quarterId = generateQuarterUUID()
+
+  const newServer = { 
+    id: quarterId, 
+    name: serverName, 
+    description 
+  }
+  console.log("New Server Created:", JSON.stringify(newServer, null, 2))
+  toast.success("Server created successfully!")
+  navigate("/bot-selection", { state: { serverName, serverId: quarterId } })
+}
+
+
 
   const truncateAddress = (address: string | undefined, start = 5, end = 4) => {
     if (!address) return ""
@@ -52,31 +99,34 @@ export default function Dashboard() {
         }}
       />
 
-      {/* Main Content */}
-      <div>
-        {/* Header */}
-        <header className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-sm">
-          <div className="flex items-center justify-between px-8 py-4">
-            <div>
-              <h1 className="text-2xl font-bold">LUMIO</h1>
-            </div>
-            <Badge variant="outline" className="border-zinc-700 text-zinc-300 font-mono text-md flex items-center gap-1">
+      {/* Header */}
+      <header className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-8 py-4">
+          <h1 className="text-2xl font-bold">LUMIO</h1>
+          {address && (
+            <Badge
+              variant="outline"
+              className="border-zinc-700 text-zinc-300 font-mono text-md flex items-center gap-1"
+            >
               <Wallet className="w-3 h-3" /> {truncateAddress(address)}
             </Badge>
-          </div>
-        </header>
+          )}
+        </div>
+      </header>
 
-        <main className="p-8 flex justify-center">
-          <div className="w-full max-w-4xl">  
+      <main className="p-8 flex justify-center">
+        <div className="w-full max-w-4xl space-y-6">
+          {loading ? (
+            <p className="text-zinc-400 text-center">Loading servers...</p>
+          ) : servers.length === 0 ? (
+            // 🟢 No servers → show button
             <Card className="bg-zinc-900 border-zinc-800">
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mb-6">
                   <Server className="w-8 h-8 text-zinc-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">No servers yet</h3>
-                <p className="text-zinc-400 text-center mb-8 max-w-md">
-                  Get started by creating your first server. Deploy and manage your Web3 applications with ease.
-                </p>
+                <p className="text-zinc-400 text-center mb-8 max-w-md">Get started by creating your first server.</p>
                 <Button
                   onClick={() => setShowForm(true)}
                   className="bg-white text-black hover:bg-zinc-200 font-medium cursor-pointer flex items-center gap-2"
@@ -85,10 +135,25 @@ export default function Dashboard() {
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        </main>
-
-      </div>
+          ) : (
+            // 🟢 Show servers list
+            <div className="grid gap-6 sm:grid-cols-2">
+              {servers.map((server) => (
+                <Card key={server.id} className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 transition">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Server className="w-5 h-5 text-zinc-400" /> {server.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-zinc-400 text-sm">{server.description || "No description"}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
 
       {/* Modal */}
       <AnimatePresence>

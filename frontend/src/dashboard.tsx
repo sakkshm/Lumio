@@ -16,7 +16,7 @@ import { toast, Toaster } from "sonner"
 const SERVERS_API_URL = "http://localhost:5000/servers"
 
 interface ServerType {
-  id: string
+  serverID: string
   name: string
   description?: string
 }
@@ -35,7 +35,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchServers = async () => {
       try {
-        const res = await fetch(SERVERS_API_URL)
+        const res = await fetch(SERVERS_API_URL + `?walletID=${address}`)
         const data = await res.json()
         setServers(data) // assumes backend sends an array of servers
       } catch (err) {
@@ -139,7 +139,7 @@ const handleSave = () => {
             // 🟢 Show servers list
             <div className="grid gap-6 sm:grid-cols-2">
               {servers.map((server) => (
-                <Card key={server.id} className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 transition">
+                <Card key={server.serverID} className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 transition">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Server className="w-5 h-5 text-zinc-400" /> {server.name}

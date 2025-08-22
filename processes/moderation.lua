@@ -25,28 +25,29 @@ local function containsBadContent(message, config)
   local msg_lower = message:lower()
 
   for _, word in ipairs(config.bannedWords) do
+    local w = word:lower()
 
     -- strictness levels:
 
     -- 1: exact match only
     if config.strictness == 1 then
-      if msg_lower == word then return word 
-    end
+      if msg_lower == w then return word end
 
-    -- 2: substring match
+    -- 2: word boundary match (so "ass" matches, but not "class")
     elseif config.strictness == 2 then
-      if string.find(msg_lower, word, 1, true) then return word 
-    end
-
-    -- 3: substring match + check split words
-    elseif config.strictness == 3 then
-      for w in msg_lower:gmatch("%w+") do
-        if w == word then return word end
+      if msg_lower:find("%f[%w]" .. w .. "%f[%W]") then
+        return word
       end
-    
-    -- 4: very strict, block if word appears anywhere
+
+    -- 3: split words and compare directly
+    elseif config.strictness == 3 then
+      for token in msg_lower:gmatch("%w+") do
+        if token == w then return word end
+      end
+
+    -- 4: very strict, block if appears anywhere (substring, no boundary)
     elseif config.strictness == 4 then
-      if string.find(msg_lower, word) then return word end
+      if msg_lower:find(w, 1, true) then return word end
     end
   end
 
@@ -74,7 +75,7 @@ Handlers.add("set-config", Handlers.utils.hasMatchingTag("Action", "SetConfig"),
 
     setServerConfig(serverId, bannedWords, strictness)
 
-    print("Server added!")
+    print("Server config updated for " .. serverId)
 
     ao.send({
       Target = msg.From,
@@ -89,7 +90,7 @@ Handlers.add("moderation-check", Handlers.utils.hasMatchingTag("Action", "Modera
   function(msg)
     local serverId = msg.Server or "global"
 
-    print("Message is: " .. msg.Data);
+    print("Message is: " .. msg.Data)
 
     local result = moderate(serverId, msg.Data)
 

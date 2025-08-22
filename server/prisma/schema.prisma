@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Server {
+  serverID      String           @id
+  walletID      String
+  name          String
+  description   String?
+  createdAt     DateTime         @default(now())
+
+  discordInfo   DiscordServer?   @relation("DiscordRelation")
+  telegramInfo  TelegramServer?  @relation("TelegramRelation")
+}
+
+model DiscordServer {
+  id        Int      @id @default(autoincrement())
+  serverID  String   @unique
+  guildID   String   @unique
+  prefix    String?
+  otherInfo Json?
+  createdAt DateTime @default(now())
+
+  server    Server   @relation("DiscordRelation", fields: [serverID], references: [serverID])
+}
+
+model TelegramServer {
+  id        Int      @id @default(autoincrement())
+  serverID  String   @unique
+  chatID    String   @unique
+  otherInfo Json?
+  createdAt DateTime @default(now())
+
+  server    Server   @relation("TelegramRelation", fields: [serverID], references: [serverID])
+}

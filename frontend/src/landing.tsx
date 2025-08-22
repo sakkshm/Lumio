@@ -94,7 +94,7 @@ export default function Landing() {
 
         <h1 className="text-5xl md:text-7xl font-bold text-white text-center mb-6 tracking-tight">Lumio is Live</h1>
         <h2 className="text-xl md:text-2xl text-gray-300 text-center mb-8 font-light">
-          AI-powered Autonomous Community
+          AI-powered Autonomous Community Maintainer
         </h2>
         <p className="text-gray-400 text-center max-w-2xl mb-12 leading-relaxed text-lg">
           Fast, affordable, and seamless — Lumio powers AI-driven community management on the Permaweb, unifying networks and enabling autonomous governance.

@@ -6,7 +6,7 @@ import { Shield, AlertTriangle, Ban, Settings, Eye } from "lucide-react"
 import { toast, Toaster } from "sonner"
 
 export default function Moderations() {
-  const [selectedLevel, setSelectedLevel] = useState("medium")
+  const [selectedLevel, setSelectedLevel] = useState(1)
   const [inputValue, setInputValue] = useState("")
   const [tags, setTags] = useState<string[]>([])
 
@@ -14,6 +14,7 @@ export default function Moderations() {
     {
       id: "low",
       name: "Low",
+      level: 1,
       description: "Basic filtering with minimal restrictions",
       icon: Eye,
       color: "bg-green-500/10 border-green-500/20 text-green-400",
@@ -21,6 +22,7 @@ export default function Moderations() {
     {
       id: "medium",
       name: "Medium",
+      level: 2,
       description: "Balanced moderation for most communities",
       icon: Shield,
       color: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
@@ -28,6 +30,7 @@ export default function Moderations() {
     {
       id: "high",
       name: "High",
+      level: 3,
       description: "Strict filtering with comprehensive protection",
       icon: AlertTriangle,
       color: "bg-red-500/10 border-red-500/20 text-red-400",
@@ -50,7 +53,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   }
 
   const handleSave = () => {
-  const blockedWordsString = tags.join(", ");
+  const blockedWordsString = tags.join(",");
   console.log("Moderation Settings:", { 
     level: selectedLevel, 
     blockedWords: blockedWordsString 
@@ -79,9 +82,9 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
                 return (
                   <div
                     key={levelOption.id}
-                    onClick={() => setSelectedLevel(levelOption.id)}
+                    onClick={() => setSelectedLevel(levelOption.level)}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${
-                      selectedLevel === levelOption.id
+                      selectedLevel === levelOption.level
                         ? levelOption.color
                         : "bg-zinc-900/50 border-zinc-700 hover:border-zinc-600"
                     }`}
@@ -89,7 +92,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
                     <div className="flex items-center gap-3 mb-2">
                       <Icon className="w-5 h-5" />
                       <span className="font-semibold">{levelOption.name}</span>
-                      {selectedLevel === levelOption.id && (
+                      {selectedLevel === levelOption.level && (
                         <Badge variant="secondary" className="ml-auto bg-white/10 text-white">
                           Selected
                         </Badge>

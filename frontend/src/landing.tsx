@@ -79,7 +79,10 @@ export default function Landing() {
       </div>
 
       <nav className="relative z-10 flex items-center justify-between px-8 py-6 backdrop-blur-sm bg-black/20">
-        <div className="text-white font-bold text-2xl tracking-wider">LUMIO</div>
+        <div className="text-white font-bold text-2xl tracking-wider flex justify-center items-center">
+          <img src="./logo.png" width="40px" className="mr-2"/>
+          LUMIO
+        </div>
         <div className="hidden md:flex items-center space-x-8 text-sm text-gray-300">
           <a className="hover:text-white transition-colors cursor-pointer font-medium">Products</a>
           <a className="hover:text-white transition-colors cursor-pointer font-medium">Developers</a>

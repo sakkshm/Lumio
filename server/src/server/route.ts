@@ -30,13 +30,21 @@ router.post("/add-server", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/get-servers", async (req: Request, res: Response) => {
-    const { walletID } = req.body;
+router.post("/get-servers", async (req: Request, res: Response) => {
+    const walletID = req.query.walletID;
+
+    if(!walletID){
+        res.status(500).json({
+            msg: "No wallet ID."
+        }) 
+
+        return;
+    }        
 
     try{
         const response = await prisma.server.findMany({
             where: {
-                walletID: walletID
+                walletID: walletID as string
             }
         })
 

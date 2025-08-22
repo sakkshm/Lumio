@@ -1,15 +1,20 @@
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import { ThemeProvider } from '@/components/theme-provider.tsx'
-import { HashRouter, Route, Routes } from "react-router";
-import { ArweaveWalletKit } from "@arweave-wallet-kit/react"
-import WanderStrategy from "@arweave-wallet-kit/wander-strategy"
-import WAuthStrategy from "@wauth/strategy"
-import { WAuthProviders } from "@wauth/strategy"
-import AosyncStrategy from "@vela-ventures/aosync-strategy"
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import { ThemeProvider } from "@/components/theme-provider.tsx";
+import { HashRouter, Route, Routes } from "react-router-dom";
+import { ArweaveWalletKit } from "@arweave-wallet-kit/react";
+import WanderStrategy from "@arweave-wallet-kit/wander-strategy";
+import WAuthStrategy, { WAuthProviders } from "@wauth/strategy";
+import AosyncStrategy from "@vela-ventures/aosync-strategy";
 
-import App from './App'
-import AnotherPage from './another-page'
+import AnotherPage from "./dashboard";
+import Login from "./login";
+import ProtectedRoute from "./components/protectedRoutes";
+import LandingPage from "./landing";
+import BotSelection from "./botSelection";
+
+// ✅ Sonner toast
+import { Toaster } from "sonner";
 
 function Main() {
   return (
@@ -23,22 +28,43 @@ function Main() {
           new WanderStrategy(),
           new WAuthStrategy({ provider: WAuthProviders.Google }),
           new WAuthStrategy({ provider: WAuthProviders.Github }),
-          new AosyncStrategy()
+          new AosyncStrategy(),
         ],
         permissions: ["ACCESS_ADDRESS", "SIGNATURE", "SIGN_TRANSACTION"],
       }}
       theme={{ displayTheme: "dark" }}
     >
       <ThemeProvider defaultTheme="dark">
+        {/* ✅ Sonner Toaster globally */}
+        <Toaster position="bottom-right" 
+        richColors
+        theme="dark" />
+
         <HashRouter>
           <Routes>
-            <Route index element={<App />} />
-            <Route path="/another-page" element={<AnotherPage />} />
+            <Route index element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AnotherPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/bot-selection"
+              element={
+                <ProtectedRoute>
+                  <BotSelection />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </HashRouter>
       </ThemeProvider>
     </ArweaveWalletKit>
-  )
+  );
 }
 
-createRoot(document.getElementById('root')!).render(<Main />)
+createRoot(document.getElementById("root")!).render(<Main />);

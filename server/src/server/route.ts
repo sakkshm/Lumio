@@ -17,9 +17,7 @@ router.post("/add-server", async (req: Request, res: Response) => {
             }
         })
 
-        res.status(200).json({
-            ...response
-        })
+        res.status(200).json(response)
     }
     catch(e){
         console.error(e);
@@ -31,7 +29,7 @@ router.post("/add-server", async (req: Request, res: Response) => {
 });
 
 router.post("/get-servers", async (req: Request, res: Response) => {
-    const walletID = req.query.walletID;
+    const walletID = req.body.walletID;
 
     if(!walletID){
         res.status(500).json({
@@ -48,9 +46,7 @@ router.post("/get-servers", async (req: Request, res: Response) => {
             }
         })
 
-        res.status(200).json({
-            ...response
-        })
+        res.status(200).json(response)
     }
     catch(e){
         console.error(e);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -10,8 +10,8 @@ import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast, Toaster } from "sonner"
 
-// yaha pe apna link paste kardena saksham !!!
-const SERVERS_API_URL = "http://localhost:5000/servers"
+
+const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`;
 
 interface ServerType {
   serverID: string
@@ -38,47 +38,93 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
+
+    if (!address) return;
+
     const fetchServers = async () => {
       try {
-        const demoServers: ServerType[] = [
-          
-        ]
-        setServers(demoServers)
+        const response = await fetch(`${SERVERS_API_URL}/get-servers`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ walletID: address }),
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch servers");
+
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+          setServers(data);
+        } else {
+          console.error("Unexpected server data:", data);
+          setServers([]);
+        }
       } catch (err) {
-        console.error("Error fetching servers:", err)
-        toast.error("Failed to load servers")
+        console.error("Error fetching servers:", err);
+        toast.error("Failed to load servers");
+        setServers([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
+    };
+
+    fetchServers();
+  }, [address]);
+
+    
+  const isSaving = useRef(false);
+
+  const handleSave = async () => {
+    if (isSaving.current) return;
+    isSaving.current = true;
+
+    if (!serverName) {
+      toast.error("Server name is required")
+      isSaving.current = false;
+      return;
     }
-    fetchServers()
-  }, [])
 
-const handleSave = () => {
-  if (!serverName) {
-    toast.error("Server name is required")
-    return
-  }
+    const newServer = {
+      serverID: generateUUID(),
+      name: serverName,
+      description,
+    }
 
-  const newServer = {
-    serverID: generateUUID(),
-    name: serverName,
-    description,
-  }
+    try {
+      const response = await fetch(`${SERVERS_API_URL}/add-server`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serverID: newServer.serverID,
+          walletID: address,
+          name: newServer.name,
+          description: newServer.description
+        }),
+      });
 
-  setServers((prev) => [...prev, newServer])
+      if (!response.ok) {
+        toast.error("Failed to add server");
+        isSaving.current = false;
+        return;
+      }
 
-  console.log("New Server Created:", JSON.stringify(newServer, null, 2))
-  toast.success("Server created successfully!")
+      const data = await response.json();
+      console.log("Server added:", data);
 
-  navigate(`/${newServer.serverID}/server`, { state: { server: newServer } })
+      setServers(prev => [...prev, newServer]); // update state
+      toast.success("Server created successfully!")
+      navigate(`/${newServer.serverID}/server`, { state: { server: newServer } });
 
-  // Optional: cleanup
-  setShowForm(false)
-  setServerName("")
-  setDescription("")
-}
+      // Cleanup
+      setShowForm(false)
+      setServerName("")
+      setDescription("")
 
+    } catch (err) {
+      toast.error("Failed to add server");
+      isSaving.current = false;
+    }
+  };
 
   const truncateAddress = (address: string | undefined, start = 5, end = 4) => {
     if (!address) return ""

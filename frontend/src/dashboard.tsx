@@ -148,18 +148,29 @@ export default function Dashboard() {
       />
 
       <header className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-sm">
-        <div className="flex items-center justify-between px-8 py-4">
-          <h1 className="text-2xl font-bold">LUMIO</h1>
-          {address && (
-            <Badge
-              variant="outline"
-              className="border-zinc-700 text-zinc-300 font-mono text-md flex items-center gap-1"
-            >
-              <Wallet className="w-3 h-3" /> {truncateAddress(address)}
-            </Badge>
-          )}
-        </div>
-      </header>
+  <div className="flex items-center justify-between px-8 py-4">
+    <h1 className="text-2xl font-bold">LUMIO</h1>
+
+    <div className="flex items-center gap-4">
+      {address && (
+        <Badge
+          variant="outline"
+          className="border-zinc-700 text-zinc-300 font-mono text-md flex items-center gap-1"
+        >
+          <Wallet className="w-3 h-3" /> {truncateAddress(address)}
+        </Badge>
+      )}
+
+      <Button
+        onClick={() => setShowForm(true)}
+        className="bg-white text-black hover:bg-zinc-200 font-medium cursor-pointer flex items-center gap-2"
+      >
+        <Plus className="w-4 h-4" /> Add Server
+      </Button>
+    </div>
+  </div>
+</header>
+
 
       <main className="p-8 flex flex-col items-center">
         <div className="w-full max-w-4xl space-y-6">
@@ -179,6 +190,8 @@ export default function Dashboard() {
             </Card>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2">
+              
+              <h1>Your Servers</h1>
               {servers.map((server) => (
                 <Card
                   key={server.serverID}
@@ -202,12 +215,7 @@ export default function Dashboard() {
 
         {/* Always visible Add Server button */}
         <div className="mt-8">
-          <Button
-            onClick={() => setShowForm(true)}
-            className="bg-white text-black hover:bg-zinc-200 font-medium cursor-pointer flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" /> Add Server
-          </Button>
+          
         </div>
       </main>
 

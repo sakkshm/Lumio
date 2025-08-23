@@ -189,7 +189,7 @@ bot.start()`
 
 
                   {/* Second Column - Code Snippet */}
-                  <div className="space-y-6 md:border-l-4 md:border-zinc-800 md:pl-8">
+                  <div >
                     <h3 className="text-xl font-semibold text-white">Step 2: Enter command</h3>
                     <p className="text-zinc-400 leading-relaxed">
                       Paste this command in your chat to link your server with Lumio.

@@ -60,6 +60,14 @@ function Main() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/:serverId/server"
+              element={
+                <ProtectedRoute>
+                  <BotSelection />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </HashRouter>
       </ThemeProvider>

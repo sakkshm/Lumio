@@ -1,5 +1,3 @@
-"use client"
-
 import telegram from "./telegram.png"
 import discord from "./discord.png"
 import sub from "./sub.png"
@@ -49,15 +47,15 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       logo: discord,
       link: "/discord",
     },
-    {
-      id: "subspace",
-      name: "Subspace",
-      description: "Build on the Subspace decentralized network",
-      features: ["Decentralized storage", "Cross-chain", "Web3 native"],
-      status: "Beta",
-      logo: sub,
-      link: "/subspace",
-    },
+    // {
+    //   id: "subspace",
+    //   name: "Subspace",
+    //   description: "COMING SOON!",
+    //   features: ["Decentralized storage", "Cross-chain", "Web3 native"],
+    //   status: "Beta",
+    //   logo: sub,
+    //   link: "/subspace",
+    // },
   ]
 
   const handlePlatformClick = (platform: Platform) => {

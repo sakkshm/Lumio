@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Server, Wallet } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast, Toaster } from "sonner"
+import { ServerCardSkeleton } from "./components/ServerCardSkeleton"
 
 
 const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`;
@@ -149,7 +150,7 @@ export default function Dashboard() {
 
       <header className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-sm">
   <div className="flex items-center justify-between px-8 py-4">
-    <h1 className="text-2xl font-bold">LUMIO</h1>
+    <h1 className="text-2xl font-bold">Lumio</h1>
 
     <div className="flex items-center gap-4">
       {address && (
@@ -175,7 +176,13 @@ export default function Dashboard() {
       <main className="p-8 flex flex-col items-center">
         <div className="w-full max-w-4xl space-y-6">
           {loading ? (
-            <p className="text-zinc-400 text-center">Loading servers...</p>
+              <div className="grid gap-6 sm:grid-cols-2 pt-4">
+                <ServerCardSkeleton />  
+                <ServerCardSkeleton />
+                <ServerCardSkeleton />
+                <ServerCardSkeleton />
+              </div>
+
           ) : servers.length === 0 ? (
             <Card className="bg-zinc-900 border-zinc-800">
               <CardContent className="flex flex-col items-center justify-center py-16">
@@ -189,26 +196,30 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2">
-              
-              <h1>Your Servers</h1>
-              {servers.map((server) => (
-                <Card
-                  key={server.serverID}
-                  className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 transition cursor-pointer"
-                >
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Server className="w-5 h-5 text-zinc-400" /> {server.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-zinc-400 text-sm">
-                      {server.description || "No description"}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+            <div>
+              <h1 className="mt-4 mb-6 text-2xl font-bold">Your Servers</h1>
+              <div className="grid gap-6 sm:grid-cols-2">
+                {servers.map((server) => (
+                  <Link to={`/${server.serverID}/server`}>
+                    <Card
+                      key={server.serverID}
+                      className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 transition cursor-pointer"
+                    >
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Server className="w-5 h-5 text-zinc-400" /> {server.name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-zinc-400 text-sm">
+                          {server.description || "No description"}
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -63,7 +63,8 @@ export default function Dashboard() {
     <div className="min-h-screen bg-black text-white">
       {/* Sidebar */}
       <div className="fixed left-0 top-0 h-full w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col">
-        <div className="pt-9 px-6">
+        <div className="pt-9 px-6 flex items-center ">
+          <img src="./logo.png" width="40px" className="mr-2"/>
           <h1 className="text-3xl font-bold tracking-tight">Lumio</h1>
         </div>
         <nav className="flex-1 px-3 py-6 space-y-1">
@@ -84,7 +85,7 @@ export default function Dashboard() {
                       setOpenDropdown(null) // close dropdown if others
                     }
                   }}
-                  className={`w-full flex items-center gap-4 justify-start rounded-lg px-5 py-3 transition-all text-md font-light
+                  className={`w-full flex items-center gap-4 justify-start rounded-lg px-5 py-3 transition-all text-md
                     ${isActive ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-900"}`}
                 >
                   {label}

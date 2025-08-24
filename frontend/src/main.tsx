@@ -11,7 +11,7 @@ import AnotherPage from "./dashboard";
 import Login from "./login";
 import ProtectedRoute from "./components/protectedRoutes";
 import LandingPage from "./landing";
-import BotSelection from "./botSelection";
+import BotSelection from "./AppSelection";
 
 // ✅ Sonner toast
 import { Toaster } from "sonner";

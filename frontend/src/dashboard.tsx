@@ -11,9 +11,10 @@ import { motion, AnimatePresence } from "framer-motion"
 import { toast, Toaster } from "sonner"
 import { ServerCardSkeleton } from "./components/ServerCardSkeleton"
 
+// API endpoint
+const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`
 
-const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`;
-
+// Server type definition
 interface ServerType {
   serverID: string
   name: string
@@ -24,12 +25,16 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const address = useActiveAddress()
 
+  // UI + state management
   const [showForm, setShowForm] = useState(false)
   const [serverName, setServerName] = useState("")
   const [description, setDescription] = useState("")
   const [servers, setServers] = useState<ServerType[]>([])
   const [loading, setLoading] = useState(true)
 
+  const isSaving = useRef(false) // prevent duplicate requests
+
+  // Generate unique server ID
   const generateUUID = () => {
     try {
       return crypto.randomUUID().substring(0, 8)
@@ -38,9 +43,9 @@ export default function Dashboard() {
     }
   }
 
+  // Fetch servers when wallet address changes
   useEffect(() => {
-
-    if (!address) return;
+    if (!address) return
 
     const fetchServers = async () => {
       try {
@@ -48,41 +53,39 @@ export default function Dashboard() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ walletID: address }),
-        });
+        })
 
-        if (!response.ok) throw new Error("Failed to fetch servers");
+        if (!response.ok) throw new Error("Failed to fetch servers")
 
-        const data = await response.json();
-        
+        const data = await response.json()
+
         if (Array.isArray(data)) {
-          setServers(data);
+          setServers(data)
         } else {
-          console.error("Unexpected server data:", data);
-          setServers([]);
+          console.error("Unexpected server data:", data)
+          setServers([])
         }
       } catch (err) {
-        console.error("Error fetching servers:", err);
-        toast.error("Failed to load servers");
-        setServers([]);
+        console.error("Error fetching servers:", err)
+        toast.error("Failed to load servers")
+        setServers([])
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchServers();
-  }, [address]);
+    fetchServers()
+  }, [address])
 
-    
-  const isSaving = useRef(false);
-
+  // Save new server
   const handleSave = async () => {
-    if (isSaving.current) return;
-    isSaving.current = true;
+    if (isSaving.current) return
+    isSaving.current = true
 
     if (!serverName) {
       toast.error("Server name is required")
-      isSaving.current = false;
-      return;
+      isSaving.current = false
+      return
     }
 
     const newServer = {
@@ -99,34 +102,37 @@ export default function Dashboard() {
           serverID: newServer.serverID,
           walletID: address,
           name: newServer.name,
-          description: newServer.description
+          description: newServer.description,
         }),
-      });
+      })
 
       if (!response.ok) {
-        toast.error("Failed to add server");
-        isSaving.current = false;
-        return;
+        toast.error("Failed to add server")
+        isSaving.current = false
+        return
       }
 
-      const data = await response.json();
-      console.log("Server added:", data);
+      const data = await response.json()
+      console.log("Server added:", data)
 
-      setServers(prev => [...prev, newServer]); // update state
+      // Update UI with new server
+      setServers((prev) => [...prev, newServer])
       toast.success("Server created successfully!")
-      navigate(`/${newServer.serverID}/server`, { state: { server: newServer } });
+
+      // Navigate to server page
+      navigate(`/${newServer.serverID}/server`, { state: { server: newServer } })
 
       // Cleanup
       setShowForm(false)
       setServerName("")
       setDescription("")
-
     } catch (err) {
-      toast.error("Failed to add server");
-      isSaving.current = false;
+      toast.error("Failed to add server")
+      isSaving.current = false
     }
-  };
+  }
 
+  // Shorten wallet address for display
   const truncateAddress = (address: string | undefined, start = 5, end = 4) => {
     if (!address) return ""
     if (address.length <= start + end) return address
@@ -135,6 +141,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Toast notifications */}
       <Toaster
         position="bottom-right"
         richColors
@@ -148,42 +155,46 @@ export default function Dashboard() {
         }}
       />
 
+      {/* ---------- Header ---------- */}
       <header className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-sm">
-  <div className="flex items-center justify-between px-8 py-4">
-    <h1 className="text-2xl font-bold">Lumio</h1>
+        <div className="flex items-center justify-between px-8 py-4">
+          <h1 className="text-2xl font-bold">Lumio</h1>
 
-    <div className="flex items-center gap-4">
-      {address && (
-        <Badge
-          variant="outline"
-          className="border-zinc-700 text-zinc-300 font-mono text-md flex items-center gap-1"
-        >
-          <Wallet className="w-3 h-3" /> {truncateAddress(address)}
-        </Badge>
-      )}
+          <div className="flex items-center gap-4">
+            {/* Wallet badge */}
+            {address && (
+              <Badge
+                variant="outline"
+                className="border-zinc-700 text-zinc-300 font-mono text-md flex items-center gap-1"
+              >
+                <Wallet className="w-3 h-3" /> {truncateAddress(address)}
+              </Badge>
+            )}
 
-      <Button
-        onClick={() => setShowForm(true)}
-        className="bg-white text-black hover:bg-zinc-200 font-medium cursor-pointer flex items-center gap-2"
-      >
-        <Plus className="w-4 h-4" /> Add Server
-      </Button>
-    </div>
-  </div>
-</header>
+            {/* Add Server button */}
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-white text-black hover:bg-zinc-200 font-medium cursor-pointer flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> Add Server
+            </Button>
+          </div>
+        </div>
+      </header>
 
-
+      {/* ---------- Main Content ---------- */}
       <main className="p-8 flex flex-col items-center">
         <div className="w-full max-w-4xl space-y-6">
+          {/* Loading skeleton */}
           {loading ? (
-              <div className="grid gap-6 sm:grid-cols-2 pt-4">
-                <ServerCardSkeleton />  
-                <ServerCardSkeleton />
-                <ServerCardSkeleton />
-                <ServerCardSkeleton />
-              </div>
-
+            <div className="grid gap-6 sm:grid-cols-2 pt-4">
+              <ServerCardSkeleton />
+              <ServerCardSkeleton />
+              <ServerCardSkeleton />
+              <ServerCardSkeleton />
+            </div>
           ) : servers.length === 0 ? (
+            // Empty state
             <Card className="bg-zinc-900 border-zinc-800">
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mb-6">
@@ -196,15 +207,13 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           ) : (
+            // Server list
             <div>
               <h1 className="mt-4 mb-6 text-2xl font-bold">Your Servers</h1>
               <div className="grid gap-6 sm:grid-cols-2">
                 {servers.map((server) => (
-                  <Link to={`/${server.serverID}/server`}>
-                    <Card
-                      key={server.serverID}
-                      className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 transition cursor-pointer"
-                    >
+                  <Link key={server.serverID} to={`/${server.serverID}/server`}>
+                    <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 transition cursor-pointer">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <Server className="w-5 h-5 text-zinc-400" /> {server.name}
@@ -216,21 +225,15 @@ export default function Dashboard() {
                         </p>
                       </CardContent>
                     </Card>
-
                   </Link>
                 ))}
               </div>
             </div>
           )}
         </div>
-
-        {/* Always visible Add Server button */}
-        <div className="mt-8">
-          
-        </div>
       </main>
 
-      {/* Modal */}
+      {/* ---------- Add Server Modal ---------- */}
       <AnimatePresence>
         {showForm && (
           <motion.div
@@ -252,6 +255,7 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-8 px-6 md:px-12">
+                  {/* Server name input */}
                   <div className="flex flex-col space-y-2 w-full">
                     <label className="text-sm font-medium text-zinc-300">
                       Server Name
@@ -263,6 +267,8 @@ export default function Dashboard() {
                       className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 px-3 py-2"
                     />
                   </div>
+
+                  {/* Description input */}
                   <div className="flex flex-col space-y-2 w-full">
                     <label className="text-sm font-medium text-zinc-300">
                       Description
@@ -274,6 +280,8 @@ export default function Dashboard() {
                       className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 min-h-[120px] px-3 py-2"
                     />
                   </div>
+
+                  {/* Action buttons */}
                   <div className="flex gap-3 pt-4">
                     <Button
                       variant="outline"

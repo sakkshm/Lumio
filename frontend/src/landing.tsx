@@ -52,7 +52,7 @@ export default function Landing() {
         <div className="absolute bottom-1/3 left-1/6 w-32 h-32 bg-gradient-radial from-white/25 to-transparent rounded-full blur-lg animate-orbit"></div>
         <div className="absolute top-1/2 right-1/5 w-24 h-24 bg-gradient-radial from-gray-300/20 to-transparent rounded-full blur-md animate-float-spiral"></div>
         <div className="absolute bottom-1/4 right-1/3 w-28 h-28 bg-gradient-radial from-gray-500/20 to-transparent rounded-full blur-lg animate-drift"></div>
-
+      
         <svg className="absolute inset-0 w-full h-full opacity-20">
           <defs>
             <linearGradient id="constellation" x1="0%" y1="0%" x2="100%" y2="100%">

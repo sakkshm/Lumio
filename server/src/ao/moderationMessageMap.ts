@@ -1,12 +1,13 @@
 const moderationMessageMap = new Map();
 
-function addModerationMessage(messageId: string, serverID: string, chatId: string, userId: string, chatMessageId: string, messageText: string){
+function addModerationMessage(messageId: string, serverID: string, chatId: string, userId: string, chatMessageId: string, messageText: string, platform: string){
     moderationMessageMap.set(messageId, {
         serverID,
         chatId,
         userId,
         chatMessageId,
-        messageText
+        messageText,
+        platform
     })
 }
 

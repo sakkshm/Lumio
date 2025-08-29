@@ -5,6 +5,7 @@
       "name": "server",
       "dependencies": {
         "@permaweb/aoconnect": "^0.0.89",
+        "@prisma/client": "^6.14.0",
         "@supabase/supabase-js": "^2.56.0",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",
@@ -97,6 +98,8 @@
     "@permaweb/aoconnect": ["@permaweb/aoconnect@0.0.89", "", { "dependencies": { "@dha-team/arbundles": "1.0.3", "@permaweb/ao-scheduler-utils": "~0.0.25", "@permaweb/protocol-tag-utils": "~0.0.2", "axios": "^1.7.9", "base64url": "^3.0.1", "buffer": "^6.0.3", "debug": "^4.4.0", "http-message-signatures": "^1.0.4", "hyper-async": "^1.1.2", "mnemonist": "^0.39.8", "ramda": "^0.30.1", "structured-headers": "^2.0.0", "zod": "^3.24.1" } }, "sha512-Wphud6V+KfQLn+siiWij/ms1TpRJ7CWA/rt01Jk+QKbQP5kW3IcncwmfNTFygoCdAQPterD6s5SHr/hNLlFCUQ=="],
 
     "@permaweb/protocol-tag-utils": ["@permaweb/protocol-tag-utils@0.0.2", "", {}, "sha512-2IiKu71W7pkHKIzxabCGQ5q8DSppZaE/sPcPF2hn+OWwfe04M7b5X5LHRXQNPRuxHWuioieGdPQb3F7apOlffQ=="],
+
+    "@prisma/client": ["@prisma/client@6.15.0", "", { "peerDependencies": { "prisma": "*", "typescript": ">=5.1.0" }, "optionalPeers": ["prisma", "typescript"] }, "sha512-wR2LXUbOH4cL/WToatI/Y2c7uzni76oNFND7+23ypLllBmIS8e3ZHhO+nud9iXSXKFt1SoM3fTZvHawg63emZw=="],
 
     "@prisma/config": ["@prisma/config@6.14.0", "", { "dependencies": { "c12": "3.1.0", "deepmerge-ts": "7.1.5", "effect": "3.16.12", "empathic": "2.0.0" } }, "sha512-IwC7o5KNNGhmblLs23swnfBjADkacBb7wvyDXUWLwuvUQciKJZqyecU0jw0d7JRkswrj+XTL8fdr0y2/VerKQQ=="],
 

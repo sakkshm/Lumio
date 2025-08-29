@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { setModerationConfig } from "../ao/connect";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -53,6 +54,34 @@ router.post("/get-servers", async (req: Request, res: Response) => {
 
         res.status(500).json({
             msg: "Unable to find server."
+        })
+    }
+});
+
+router.post("/set-moderation-config", async (req: Request, res: Response) => {
+    const { serverID, walletID, strictnessLevel, bannedWords } = req.body;
+
+    try{
+        await prisma.server.update({
+            where: {
+                serverID: serverID,
+                walletID: walletID
+            },
+            data: {
+                strictnessLevel: strictnessLevel,
+                bannedWords: bannedWords
+            }
+        })
+
+        setModerationConfig(serverID, strictnessLevel, bannedWords);
+        res.status(200).json({
+            msg: "Config set for: " + serverID
+        })
+    }
+    catch(e){
+        console.error(e);
+        res.status(500).json({
+            msg: "Unable to set config for: " + serverID
         })
     }
 });

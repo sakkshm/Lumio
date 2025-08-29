@@ -1,10 +1,15 @@
 import { result } from "@permaweb/aoconnect";
 import { moderationMessageMap, removeModerationMessage } from "./moderationMessageMap";
-import { handleMessageModerationResult } from "../telegram/telegram";
+import { handleTelegramMessageModerationResult } from "../telegram/telegram";
+import { handleDiscordMessageModerationResult } from "../discord/discord";
 
 const responsePromises = new Map();
 
 export function getModerationResponses(){
+
+    if(moderationMessageMap.size == 0){
+        return;
+    }
 
     console.log("Running through response queue.")
 
@@ -25,17 +30,28 @@ export function getModerationResponses(){
                     if(Messages != undefined){
                         //@ts-ignore
                         console.log(Messages[0].Data);
-
                         const response = Messages[0].Data;
 
-                        handleMessageModerationResult(
-                            response, 
-                            value.serverID, 
-                            value.chatId, 
-                            value.userId, 
-                            value.chatMessageId, 
-                            value.messageText
-                        );
+                        if(value.platform == 'telegram'){
+                            handleTelegramMessageModerationResult(
+                                response, 
+                                value.serverID, 
+                                value.chatId, 
+                                value.userId, 
+                                value.chatMessageId, 
+                                value.messageText
+                            );
+                        }
+                        if(value.platform == 'discord'){
+                            handleDiscordMessageModerationResult(
+                                response, 
+                                value.serverID, 
+                                value.chatId, 
+                                value.userId, 
+                                value.chatMessageId, 
+                                value.messageText
+                            );
+                        }                    
 
                         responsePromises.delete(key);
                         removeModerationMessage(key);

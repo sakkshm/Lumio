@@ -189,20 +189,19 @@ export default function Dashboard() {
           )}
       </aside>
     {/* ---------- Main Content ---------- */}
-    <div className="ml-64 flex-1 p-8 relative z-10">
-      <main className="bg-black rounded-2xl border border-zinc-800 p-8 shadow-xl">
-
-        {/* Header inside the card */}
-        <header className="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
-          <h2 className="text-2xl font-semibold tracking-tight">
-            {getActiveTabLabel()}
-            {activeTab === "engagement" ? ` / ${activeSubTab}` : ""}
-          </h2>
-        </header>
-        {/* Content */}
-        <div className="text-center">{renderContent()}</div>
-      </main>
-    </div>
+<div className="ml-64 flex-1 flex p-8 relative z-10 h-screen">
+  <main className="w-full h-full bg-black rounded-2xl border border-zinc-800 p-8 shadow-xl flex flex-col">
+    {/* Header */}
+    <header className="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
+      <h2 className="text-2xl font-semibold tracking-tight">
+        {getActiveTabLabel()}
+        {activeTab === "engagement" ? ` / ${activeSubTab}` : ""}
+      </h2>
+    </header>
+    {/* Content takes all remaining height */}
+    <div className="flex-1 overflow-hidden">{renderContent()}</div>
+  </main>
+</div>
   </div>
 )
 }

@@ -164,14 +164,15 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
                   </button>
                 </Badge>
               ))}
-              <input
-                type="text"
-                placeholder="Type a word..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="flex-1 bg-transparent text-white placeholder:text-zinc-500 outline-none py-2"
-              />
+<input
+  type="text"
+  placeholder="Type a word..."
+  value={inputValue}
+  onChange={(e) => setInputValue(e.target.value)}
+  onKeyDown={handleKeyDown}
+  className="flex-1 bg-transparent text-white placeholder:text-zinc-500 outline-none h-24 px-3 rounded-md"
+/>
+
             </div>
             <p className="text-xs text-zinc-500 mt-2">
               Type a word and press <span className="text-white">Space</span> or{" "}

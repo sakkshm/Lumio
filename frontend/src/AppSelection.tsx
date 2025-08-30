@@ -1,8 +1,19 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Wallet } from "lucide-react"
+import { Settings } from "lucide-react"
+import {
+  Wallet,
+  LayoutDashboard,
+  Shield,
+  Bot,
+  Users,
+  BarChart3,
+  List,
+  Bell,
+} from "lucide-react"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
+import noise from "@/components/noisy.png"
 
 // Import dashboard sections
 import Moderations from "./components/Moderations"
@@ -13,28 +24,25 @@ import Logs from "./components/Logs"
 import BotSelectionSidebar from "./components/bot-selection-sidebar"
 
 export default function Dashboard() {
-  // Active wallet address
   const address = useActiveAddress()
 
-  // State for active navigation tabs
   const [activeTab, setActiveTab] = useState("bot-selection")
   const [activeSubTab, setActiveSubTab] = useState("Leaderboard")
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
 
-  // Shorten wallet address for display
   const shortenAddress = (addr: string | undefined) => {
     if (!addr) return ""
     return `${addr.slice(0, 6)}...${addr.slice(-5)}`
   }
 
-  // Sidebar navigation menu
   const menuItems = [
-    { id: "bot-selection", label: "Connectivity" },
-    { id: "moderations", label: "Moderations" },
-    { id: "assistant", label: "Community Assistant" },
+    { id: "bot-selection", label: "Connectivity", icon: LayoutDashboard },
+    { id: "moderations", label: "Moderations", icon: Shield },
+    { id: "assistant", label: "Community Assistant", icon: Bot },
     {
       id: "engagement",
       label: "Community Engagement",
+      icon: Users,
       subItems: [
         "Leaderboard",
         "Polls",
@@ -45,11 +53,10 @@ export default function Dashboard() {
         "Personas",
       ],
     },
-    { id: "analytics", label: "Analytics" },
-    { id: "logs", label: "Logs" },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "logs", label: "Logs", icon: List },
   ]
 
-  // Render the content for the selected tab
   const renderContent = () => {
     switch (activeTab) {
       case "bot-selection":
@@ -65,57 +72,84 @@ export default function Dashboard() {
       case "logs":
         return <Logs />
       default:
-        return <div>Select a section</div>
+        return <div className="text-lg">Select a section</div>
     }
   }
 
-  // Get the label of the currently active tab
   const getActiveTabLabel = () => {
     const item = menuItems.find((menu) => menu.id === activeTab)
     return item ? item.label : activeTab
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* ---------- Sidebar ---------- */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col">
-        {/* Logo + App name */}
-        <div className="pt-9 px-6 flex items-center">
-          <img src="./logo.png" width="40px" className="mr-2" />
-          <h1 className="text-3xl font-bold tracking-tight">Lumio</h1>
-        </div>
+  <div
+    className="min-h-screen bg-gradient-to-br from-neutral-900 via-black to-zinc-950 text-white flex relative overflow-hidden"
+  >
+    {/* Global Noise Background */}
+    <div
+      className="absolute inset-0 opacity-100 pointer-events-none"
+      style={{
+        backgroundImage: `url(${noise})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    />
 
-        {/* Navigation menu */}
-        <nav className="flex-1 px-3 py-6 space-y-1">
-          {menuItems.map(({ id, label, subItems }) => {
+    {/* ---------- Sidebar ---------- */}
+    <aside className="fixed left-0 top-0 h-full w-64 bg-black/30 backdrop-blur-md flex flex-col border-r border-zinc-800">
+    <div
+    className="absolute inset-0 opacity-50 pointer-events-none"
+    style={{
+      backgroundImage: `url(${noise})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  />
+        <div className="pt-8 px-6 flex items-center">
+          <img src="./logo.png" width="40px" className="mr-3" />
+          <h1 className="text-2xl font-semibold tracking-tight">Lumio</h1>
+        </div>
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-6 space-y-2 text-base">
+          {menuItems.map(({ id, label, subItems, icon: Icon }) => {
             const isActive = activeTab === id
             const isOpen = openDropdown === id
 
             return (
-              <div key={id} className="mt-2">
-                {/* Main tab button */}
+              <div key={id}>
                 <Button
                   variant="ghost"
                   onClick={() => {
                     if (subItems) {
-                      // Toggle dropdown if subItems exist
                       setOpenDropdown(isOpen ? null : id)
                       setActiveTab(id)
                     } else {
-                      // Direct navigation
                       setActiveTab(id)
                       setOpenDropdown(null)
                     }
                   }}
-                  className={`w-full flex items-center gap-4 justify-start rounded-lg px-5 py-3 transition-all text-md
-                    ${isActive ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-900"}`}
+                  className={`w-full flex items-center gap-3 justify-start rounded-lg px-4 py-3 text-base transition-all
+                    ${
+                      isActive
+                        ? "bg-white/10 text-white"
+                        : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    }`}
                 >
-                  {label}
+                  <Icon className="w-5 h-5 text-zinc-400" />
+                  <span
+                    className={
+                      label === "Connectivity"
+                        ? "text-zinc-400"
+                        : isActive
+                          ? "text-white"
+                          : "text-zinc-400 group-hover:text-white"
+                    }
+                  >
+                    {label}
+                  </span>
                 </Button>
-
-                {/* Dropdown sub-items */}
                 {subItems && isOpen && (
-                  <div className="ml-6 mt-1 space-y-1">
+                  <div className="ml-6 mt-2 space-y-1">
                     {subItems.map((sub) => (
                       <Button
                         key={sub}
@@ -124,11 +158,11 @@ export default function Dashboard() {
                           setActiveTab(id)
                           setActiveSubTab(sub)
                         }}
-                        className={`w-full justify-start rounded-lg px-3 py-1.5 text-sm transition-all font-ligh
+                        className={`w-full justify-start rounded-md px-3 py-2 text-sm transition-all
                           ${
                             activeSubTab === sub && isActive
-                              ? "bg-zinc-700 text-white"
-                              : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                              ? "bg-white/10 text-white"
+                              : "text-zinc-400 hover:text-white hover:bg-white/5"
                           }`}
                       >
                         {sub}
@@ -140,32 +174,35 @@ export default function Dashboard() {
             )
           })}
         </nav>
-      </div>
 
-      {/* ---------- Main Content ---------- */}
-      <div className="ml-64 flex-1 p-8">
-        {/* Header */}
-        <header className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
-          <h2 className="text-2xl font-bold">
+        {/* Profile bottom */}
+          {address && (
+            <div className="px-4 pb-6 mt-auto">   {/* 👈 pushes it to bottom with breathing space */}
+              <Badge 
+                variant="outline"
+                className="w-full justify-center text-zinc-300 font-mono text-sm px-3 py-2 rounded-lg flex items-center gap-2 bg-zinc-900/60 backdrop-blur-sm"
+              >
+                <Wallet className="w-5 h-5 text-zinc-400 shrink-0" />
+                <span>{shortenAddress(address)}</span>
+              </Badge>
+            </div> 
+          )}
+      </aside>
+    {/* ---------- Main Content ---------- */}
+    <div className="ml-64 flex-1 p-8 relative z-10">
+      <main className="bg-black rounded-2xl border border-zinc-800 p-8 shadow-xl">
+
+        {/* Header inside the card */}
+        <header className="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
+          <h2 className="text-2xl font-semibold tracking-tight">
             {getActiveTabLabel()}
             {activeTab === "engagement" ? ` / ${activeSubTab}` : ""}
           </h2>
-
-          {/* Wallet address (top-right) */}
-          {address && (
-            <Badge
-              variant="outline"
-              className="border-zinc-700 text-zinc-300 font-mono text-sm px-3 py-2 rounded-lg flex items-center gap-2"
-            >
-              <Wallet className="w-4 h-4 text-zinc-400 shrink-0" />
-              <span>{shortenAddress(address)}</span>
-            </Badge>
-          )}
         </header>
-
-        {/* Dynamic section content */}
-        <main>{renderContent()}</main>
-      </div>
+        {/* Content */}
+        <div className="text-center">{renderContent()}</div>
+      </main>
     </div>
-  )
+  </div>
+)
 }

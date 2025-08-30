@@ -10,6 +10,7 @@ import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast, Toaster } from "sonner"
 import { ServerCardSkeleton } from "./components/ServerCardSkeleton"
+import noise from "@/components/noisy.png"
 
 // API endpoint
 const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`
@@ -141,6 +142,14 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <div
+        className="fixed inset-0 bg-repeat opacity-20 pointer-events-none"
+        style={{
+          backgroundImage: `url(${noise})`,
+          backgroundSize: "110%",
+          backgroundPosition: "center",
+        }}
+      />
       {/* Toast notifications */}
       <Toaster
         position="bottom-right"

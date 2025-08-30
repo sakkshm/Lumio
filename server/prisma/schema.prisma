@@ -18,6 +18,10 @@ model Server {
   strictnessLevel Int?
   bannedWords     String?
 
+  //AI prompts
+  personaPrompt String?
+  docsPrompt  String?
+
   discordInfo   DiscordServer?   @relation("DiscordRelation")
   telegramInfo  TelegramServer?  @relation("TelegramRelation")
 }

@@ -1,13 +1,16 @@
-import telegram from "./telegram.png"
-import discord from "./discord.png"
-import sub from "./sub.png"
+"use client"
+
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { X, ExternalLink, Copy } from "lucide-react"
+import { X, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
+import disnew from "./discordNew.jpg"
+import telenew from "./teleNew.jpg"
+import subnew from "./subNew.jpg"
+import { Settings } from "lucide-react"
 
 interface BotSelectionSidebarProps {
   className?: string
@@ -35,8 +38,8 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       description: "Deploy bots for Telegram messaging platform",
       features: ["Message handling", "Inline keyboards", "File sharing"],
       status: "Active",
-      logo: telegram,
-      link: "/telegram", // <-- route you can change later
+      logo: telenew,
+      link: "/telegram",
     },
     {
       id: "discord",
@@ -44,18 +47,18 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       description: "Create bots for Discord servers and communities",
       features: ["Slash commands", "Voice integration", "Role management"],
       status: "Active",
-      logo: discord,
+      logo: disnew,
       link: "/discord",
     },
-    // {
-    //   id: "subspace",
-    //   name: "Subspace",
-    //   description: "COMING SOON!",
-    //   features: ["Decentralized storage", "Cross-chain", "Web3 native"],
-    //   status: "Beta",
-    //   logo: sub,
-    //   link: "/subspace",
-    // },
+    {
+      id: "subspace",
+      name: "Subspace",
+      description: "Build on the subspace decentralized Network",
+      features: ["Slash Commands", "Voice Integration", "Role Management"],
+      status: "Beta",
+      logo: subnew,
+      link: "/subspace",
+    },
   ]
 
   const handlePlatformClick = (platform: Platform) => {
@@ -97,40 +100,70 @@ bot.start()`
 
   return (
     <>
-      <div className={`bg-zinc-950 h-full p-6 ${className}`}>
-        <h2 className="text-lg font-semibold text-white mb-4">Select Platforms</h2>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+      <div className={`bg-zinc-950 min-h-screen flex flex-col p-6 ${className}`}>
+        <h2 className="text-lg font-semibold text-white mb-6 ml-[-843px] text-zinc-500">Select Platform</h2>
+
+        {/* Platform Cards - take available space */}
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 flex-1">
           {platforms.map((platform) => (
             <div
               key={platform.id}
-              onClick={() => handlePlatformClick(platform)}
-              className="relative p-5 rounded-xl cursor-pointer border-2 transition-all duration-200 flex flex-col w-full
-                border-zinc-800 bg-zinc-950 hover:border-zinc-700 hover:bg-zinc-900"
+                onClick={() => {
+                  if (platform.id !== "subspace") {
+                    handlePlatformClick(platform)
+                  }
+                }}
+              className="relative p-6 rounded-xl h-90 cursor-pointer border border-zinc-800 transition-all duration-200 flex flex-col w-full
+                bg-gradient-to-b from-zinc-950 to-zinc-900 hover:border-zinc-700"
             >
-              {/* Logo */}
-              <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-3">
-                <img src={platform.logo || "/placeholder.svg"} alt={`${platform.name} logo`} className="w-10 h-10" />
+              {platform.id === "subspace" && (
+                <div className="absolute inset-0 rounded-xl flex items-center justify-center z-10 pointer-events-none">
+                  {/* Diagonal Banner */}
+                  <div className="bg-gradient-to-r from-zinc-800/80 to-zinc-700/80 text-white 
+                                  text-2xl font-bold px-16 py-5 transform rotate-12 
+                                  shadow-xl border border-zinc-600 rounded-lg backdrop-blur-[2px]">
+                    COMING SOON
+                  </div>
+                </div>
+              )}
+              <div className={platform.id === "subspace" ? "blur-[1px]" : ""}>
+                {/* Logo */}
+              <div className="flex justify-center mb-4">
+                <img
+                  src={platform.logo || "/placeholder.svg"}
+                  alt={`${platform.name} logo`}
+                  className="w-10 h-10 object-contain"
+                />
               </div>
 
               {/* Name */}
-              <h3 className="font-semibold text-white mb-1">{platform.name}</h3>
+              <h3 className="font-semibold text-white text-lg mb-2 text-center">{platform.name}</h3>
 
               {/* Description */}
-              <p className="text-zinc-400 text-sm mt-2">{platform.description}</p>
+              <p className="text-zinc-400 text-sm mb-4 text-center">{platform.description}</p>
 
               {/* Features */}
-              <div className="flex flex-wrap gap-1 mt-3">
+              <div className="flex flex-wrap gap-2 justify-center mb-6">
                 {platform.features.map((feature) => (
-                  <span key={feature} className="px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded text-xs">
+                  <span key={feature} className="px-3 py-1 bg-zinc-800/50 text-zinc-400 rounded text-xs">
                     {feature}
                   </span>
                 ))}
+              </div>
+
+              {/* Add to Server / Community button */}
+              <Button
+                onClick={() => handlePlatformClick(platform)}
+                className="mt-auto w-full border border-zinc-500 bg-zinc-950 text-zinc-500 hover:bg-zinc-800 font-medium py-2 rounded-lg"
+              >
+                {platform.name === "Telegram" ? "Add to Community" : "Add to Server"}
+              </Button>
               </div>
             </div>
           ))}
         </div>
       </div>
-
+      {/* Popup Modal */}
       <AnimatePresence>
         {showPopup && selectedPlatform && (
           <motion.div
@@ -168,38 +201,33 @@ bot.start()`
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
                   {/* First Column - Join the Link */}
-                  <div className="space-y-6">
+                  <div className="space-y-6 text-left">
                     <h3 className="text-xl font-semibold text-white">Step 1: Deploy Bot</h3>
                     <p className="text-zinc-400 leading-relaxed">
-                      Connect your {selectedPlatform.name} Server to start using Lumio and managing your
-                      community. 
-                      {selectedPlatform.name === "Telegram" && ( 
-                        <p>
-                          <br/>
-                          <b>Note: Promote the bot to Admin</b> <br/>
-                          <br/>
-                          Go to members list, right click on "Lumio" and select "Promote to Admin". 
-                          Enable all permissions for full functionality.
-                        </p> 
+                      Connect your {selectedPlatform.name} Server to start using Lumio and managing your community.
+                      {selectedPlatform.name === "Telegram" && (
+                        <p className="mt-2 text-zinc-300">
+                          <b>Note:</b> Promote the bot to Admin. Go to members list → right click on "Lumio" → Promote
+                          to Admin and enable all permissions.
+                        </p>
                       )}
                     </p>
                   </div>
 
-
                   {/* Second Column - Code Snippet */}
-                  <div >
+                  <div className="space-y-6 text-right">
                     <h3 className="text-xl font-semibold text-white">Step 2: Enter command</h3>
                     <p className="text-zinc-400 leading-relaxed">
                       Paste this command in your chat to link your server with Lumio.
                     </p>
-                    <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-6 overflow-x-auto">
-                      <pre className="text-sm text-zinc-300 font-mono whitespace-pre-wrap leading-relaxed">
+                    <div className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-6 overflow-x-auto w-full">
+                      <pre className="text-sm text-zinc-300 font-mono whitespace-pre-wrap leading-relaxed text-left">
                         <code>{`/link code`}</code>
                       </pre>
                     </div>
                   </div>
 
-                  {/* Buttons Row (spans full width) */}
+                  {/* Buttons Row */}
                   <div className="col-span-1 md:col-span-2 flex gap-4 mt-6">
                     <Button
                       onClick={handleSaveClick}
@@ -217,7 +245,6 @@ bot.start()`
                     </Button>
                   </div>
                 </CardContent>
-
 
               </Card>
             </motion.div>

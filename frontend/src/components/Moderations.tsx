@@ -4,11 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Shield, AlertTriangle, Ban, Settings, Eye } from "lucide-react"
 import { toast, Toaster } from "sonner"
+import { useActiveAddress } from "@arweave-wallet-kit/react"
+import { useParams } from "react-router-dom";
+
+const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`
 
 export default function Moderations() {
   const [selectedLevel, setSelectedLevel] = useState(1)
   const [inputValue, setInputValue] = useState("")
   const [tags, setTags] = useState<string[]>([])
+  const address = useActiveAddress()
+  const { serverId } = useParams();
 
   const moderationLevels = [
     {
@@ -52,8 +58,32 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setTags(tags.filter((t) => t !== tag))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
   const blockedWordsString = tags.join(",");
+  alert(serverId)
+  try{
+      const response = await fetch(`${SERVERS_API_URL}/set-moderation-config`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serverID: serverId,
+          walletID: address,
+          strictnessLevel: selectedLevel,
+          bannedWords: blockedWordsString
+        }),
+      })
+
+      if (!response.ok) {
+        toast.error("Failed to add server")
+        return
+      }
+
+      const data = await response.json()
+      console.log("Server added:", data)
+  }
+  catch{
+    toast.error("Unable to set config!")
+  }
   console.log("Moderation Settings:", { 
     level: selectedLevel, 
     blockedWords: blockedWordsString 

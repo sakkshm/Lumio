@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { FileText, Loader2, Settings } from "lucide-react"
+import { FileText, Loader2, CheckCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router-dom"
@@ -98,13 +98,13 @@ export default function CommunityAssistant() {
               Enter a master prompt for your AI Agent
             </p>
 
-          <Textarea
-            placeholder="Place your prompt here..."
-            value={personaPrompt}
-            onChange={(e) => setPersonaPrompt(e.target.value)}
-            className="bg-zinc-900/50 border-zinc-700 text-white min-h-[200px] resize-none"
-          />
-        </section>
+            <Textarea
+              placeholder="Place your prompt here..."
+              value={personaPrompt}
+              onChange={(e) => setPersonaPrompt(e.target.value)}
+              className="bg-zinc-900/50 border-zinc-700 text-white min-h-[200px] resize-none"
+            />
+          </section>
 
           {/* ---------- Docs Agent Setup ---------- */}
           <section>
@@ -118,26 +118,26 @@ export default function CommunityAssistant() {
               Enter your community docs as wikis
             </p>
 
-          <Textarea
-            placeholder="Paste docs, links, or notes here..."
-            value={docsPrompt}
-            onChange={(e) => setDocsPrompt(e.target.value)}
-            className="bg-zinc-900/50 border-zinc-700 text-white min-h-[200px] resize-none"
-          />
-        </section>
+            <Textarea
+              placeholder="Paste docs, links, or notes here..."
+              value={docsPrompt}
+              onChange={(e) => setDocsPrompt(e.target.value)}
+              className="bg-zinc-900/50 border-zinc-700 text-white min-h-[200px] resize-none"
+            />
+          </section>
+        </div>
 
         {/* ---------- Save Button ---------- */}
-        <div className="flex justify-start">
+        <div className="flex justify-end">
           <Button
             onClick={handleSave}
-            className="bg-white text-black hover:bg-zinc-200 font-semibold px-8 py-2 transition-all duration-200 hover:scale-105 cursor-pointer"
+            className="bg-white text-black w-40 h-10 hover:bg-zinc-200 font-semibold px-10 py-3 text-lg transition-all duration-200 hover:scale-105 cursor-pointer rounded-xl"
           >
-            <Settings className="w-4 h-4 mr-2" />
+            <CheckCircle className="w-6 h-6 mr-2" />
             Save
           </Button>
         </div>
       </div>
-    </div>
     </div>
   )
 }

@@ -37,7 +37,7 @@ export default function Dashboard() {
 
   const menuItems = [
     { id: "bot-selection", label: "Connectivity", icon: LayoutDashboard },
-    { id: "moderations", label: "Moderations", icon: Shield },
+    { id: "moderations", label: "Moderation", icon: Shield },
     { id: "assistant", label: "Community Assistant", icon: Bot },
     {
       id: "engagement",
@@ -46,10 +46,8 @@ export default function Dashboard() {
       subItems: [
         "Onboarding",
         "Polls",
-        "Bounties",
-        "Saved moments",
-        "Waitlist",
-        "Personas",
+        "Leaderboard",
+        "Announcements",
       ],
     },
     { id: "analytics", label: "Analytics", icon: BarChart3 },

@@ -34,7 +34,7 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       id: "telegram",
       name: "Telegram",
       description: "Deploy bots for Telegram messaging platform",
-      features: ["Message handling", "Inline keyboards", "File sharing"],
+      features: ["Messaging", "Groups", "Channels"], // Add relevant features
       status: "Active",
       logo: telenew,
       link: "/telegram",
@@ -43,7 +43,7 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       id: "discord",
       name: "Discord",
       description: "Create bots for Discord servers and communities",
-      features: ["Slash commands", "Voice integration", "Role management"],
+      features: ["Voice", "Text", "Roles"], // Add relevant features
       status: "Active",
       logo: disnew,
       link: "/discord",
@@ -52,7 +52,7 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       id: "subspace",
       name: "Subspace",
       description: "Build on the subspace decentralized Network",
-      features: ["Slash Commands", "Voice Integration", "Role Management"],
+      features: ["Decentralized", "Blockchain"], // Add relevant features
       status: "Beta",
       logo: subnew,
       link: "/subspace",
@@ -77,16 +77,7 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
   }
 
   const handleCopyCode = async () => {
-    const codeSnippet = `// ${selectedPlatform?.name} Bot Configuration
-import { ${selectedPlatform?.name}Bot } from '@lumio/sdk'
-
-const bot = new ${selectedPlatform?.name}Bot({
-  token: process.env.${selectedPlatform?.name.toUpperCase()}_TOKEN,
-  webhookUrl: 'https://your-app.vercel.app/api/webhook',
-  features: ${JSON.stringify(selectedPlatform?.features, null, 2)}
-})
-
-bot.start()`
+    const codeSnippet = `/link ${serverId}`
 
     try {
       await navigator.clipboard.writeText(codeSnippet)
@@ -136,23 +127,24 @@ bot.start()`
             className="w-20 h-20 object-contain" // ✅ larger icons
           />
         </div>
-
-        {/* Name */}
-        {/* Name */}
-<h3 className="font-semibold text-white text-2xl mb-2">{platform.name}</h3>
-
-{/* Description */}
-<p className="text-zinc-400 text-lg mb-4">{platform.description}</p>
-
-
-
+          {/* Name */}
+          <h3 className="font-semibold text-white text-2xl mb-2">{platform.name}</h3>
+          {/* Description */}
+          <p className="text-zinc-400 text-lg mb-4">{platform.description}</p>
         {/* Button */}
         <Button
-          onClick={() => handlePlatformClick(platform)}
-          className="w-full border border-zinc-500 bg-zinc-950 text-zinc-500 hover:bg-zinc-800 font-medium py-2 mt-6 rounded-lg"
-        >
-          {platform.name === "Telegram" ? "Add to Community" : "Add to Server"}
-        </Button>
+        onClick={() => {
+          if (platform.id !== "subspace") {
+            handlePlatformClick(platform)
+          }
+        }}
+        disabled={platform.id === "subspace"} 
+        className={`w-full border border-zinc-500 bg-zinc-950 text-zinc-500 font-medium py-2 mt-6 rounded-lg 
+          ${platform.id === "subspace" ? "opacity-50 cursor-not-allowed" : "hover:bg-zinc-800"}`}
+      >
+        {platform.id === "Telegram" ? "Add to Community" : "Add to Server"}
+      </Button>
+
       </div>
     </div>
   ))}

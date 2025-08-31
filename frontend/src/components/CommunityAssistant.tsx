@@ -1,6 +1,6 @@
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { FileText } from "lucide-react"
+import { FileText, Save } from "lucide-react"   // ✅ Added Save icon
 
 export default function CommunityAssistant() {
   return (
@@ -47,7 +47,8 @@ export default function CommunityAssistant() {
 
         {/* ---------- Shared Save Button ---------- */}
         <div className="flex justify-end">
-          <Button className="bg-zinc-700 hover:bg-zinc-600 text-white">
+          <Button className="bg-white hover:bg-zinc-200 text-black font-semibold text-lg px-6 py-3 rounded-lg flex items-center gap-2 shadow-md w-30 h-10">
+            <Save className="w-10 h-10" />   {/* ✅ Icon */}
             Save
           </Button>
         </div>

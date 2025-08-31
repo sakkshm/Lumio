@@ -44,9 +44,8 @@ export default function Dashboard() {
       label: "Community Engagement",
       icon: Users,
       subItems: [
-        "Leaderboard",
-        "Polls",
         "Onboarding",
+        "Polls",
         "Bounties",
         "Saved moments",
         "Waitlist",

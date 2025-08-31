@@ -31,7 +31,6 @@ export default function CommunityEngagement({ activeSection }: { activeSection: 
       case "Onboarding":
         return (
           <div className="space-y-6">
-            
             <div className="grid gap-6">
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Welcome Journey</h3>

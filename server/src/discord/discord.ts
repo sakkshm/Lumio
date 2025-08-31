@@ -5,6 +5,8 @@ import { sendMessageforModeration } from "../ao/connect";
 
 dotenv.config();
 const prisma = new PrismaClient();
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_API_URL = process.env.GROQ_API_URL;
 
 const bot = new Client({
   intents: [
@@ -18,7 +20,7 @@ bot.once("ready", () => {
   if (!bot.user) {
     throw new Error("Discord bot cannot log in.");
   }
-  console.log(`Logged in as ${bot.user.tag}`);
+  console.log(`Discord Bot Logged in as ${bot.user.tag}`);
 });
 
 bot.on("messageCreate", async (message) => {
@@ -46,10 +48,19 @@ bot.on("messageCreate", async (message) => {
     const guildId = message.guild.id;
 
     try {
-      await prisma.discordServer.create({
-        data: {
-          serverID: serverID,
+      await prisma.discordServer.upsert({
+        where: { guildID: guildId },
+        update: { 
           guildID: guildId,
+          server: {
+            connect: { serverID: serverID }
+          }  
+        },
+        create: {
+          guildID: guildId,
+          server: {
+            connect: { serverID: serverID },
+          },
         },
       });
 
@@ -59,6 +70,57 @@ bot.on("messageCreate", async (message) => {
       await message.reply("Unable to link server!");
     }
   }
+
+  //Community chatbot
+  if (message.content.startsWith("!ask")) {
+
+    await message.channel.sendTyping();
+
+    try {
+      const serverData = await prisma.server.findFirst({
+        where: {
+           discordInfo: {
+            guildID: message.guild.id
+           }
+        }
+      })
+
+      //Make grok call
+      const response = await fetch( GROQ_API_URL!, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              "content": "You are an AI assistant combining official documentation, community knowledge, and your own reasoning. Keep responses concise and plaintext only unless the user asks for detailed explanations.\n\nRules:\n- Be clear, concise, and technically accurate.\n- Act like a mentor; explain step-by-step only if asked.\n- Use community docs first; reason only if necessary.\n- Give examples or code snippets only if requested.\n- Never hallucinate APIs or facts.\n- Ask clarifying questions if the user query is ambiguous.\n\nResponse style:\n- Direct answer first, followed by optional context only if requested.\n- Keep all responses plaintext; no markdown or formatting unless user asks.\n\nGoal:\n- Provide clear, structured, and correct answers that help users solve problems while staying concise."
+            },
+          { role: "system", content: serverData?.personaPrompt || "" },
+          { role: "system", content: serverData?.docsPrompt || "" },
+          { role: "user", content: message.content || "" },
+          ],
+        }),
+      });
+      
+      const data: any = await response.json();
+
+      if(!response.ok){
+        throw new Error("Unable to generate response");
+      }
+      
+      const replyText = data?.choices?.[0]?.message?.content || "No response generated."
+      await message.reply(replyText);
+    } catch (e) {
+      console.error(e);
+      await message.reply("Unable to generate a response!");
+    }
+
+    return;
+  }  
 
   //Moderate message
 

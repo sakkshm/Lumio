@@ -1,11 +1,89 @@
+import { useState, useEffect } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { FileText } from "lucide-react"
+import { FileText, Loader2, Settings } from "lucide-react"
+import { toast } from "sonner"
+import { useActiveAddress } from "@arweave-wallet-kit/react"
+import { useParams } from "react-router-dom"
+
+const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`
 
 export default function CommunityAssistant() {
+  const [personaPrompt, setPersonaPrompt] = useState("")
+  const [docsPrompt, setDocsPrompt] = useState("")
+  const [loading, setLoading] = useState(true)
+
+  const address = useActiveAddress()
+  const { serverId } = useParams()
+
+  // Fetch prompts on mount
+  useEffect(() => {
+    const fetchPrompts = async () => {
+      try {
+        const res = await fetch(`${SERVERS_API_URL}/get-chatbot-prompt`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            serverID: serverId,
+            walletID: address,
+          }),
+        })
+
+        if (!res.ok) throw new Error("Failed to fetch chatbot prompts")
+
+        const data = await res.json()
+        if (data.personaPrompt) setPersonaPrompt(data.personaPrompt)
+        if (data.docsPrompt) setDocsPrompt(data.docsPrompt)
+      } catch (err) {
+        console.error(err)
+        toast.error("Failed to load chatbot prompts")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (serverId && address) {
+      fetchPrompts()
+    }
+  }, [serverId, address])
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch(`${SERVERS_API_URL}/set-chatbot-prompt`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serverID: serverId,
+          walletID: address,
+          personaPrompt,
+          docsPrompt,
+        }),
+      })
+
+      if (!res.ok) {
+        toast.error("Failed to save prompts")
+        return
+      }
+
+      toast.success("Prompts saved successfully!")
+    } catch (err) {
+      console.error(err)
+      toast.error("Unable to save prompts")
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-white" />
+        <span className="ml-3 text-lg">Loading...</span>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="space-y-12 flex-1">
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-12">
         {/* ---------- Exclusive Actions ---------- */}
         <section>
           <div className="flex items-center gap-2 mb-2">
@@ -20,6 +98,8 @@ export default function CommunityAssistant() {
 
           <Textarea
             placeholder="Place your prompt here..."
+            value={personaPrompt}
+            onChange={(e) => setPersonaPrompt(e.target.value)}
             className="bg-zinc-900/50 border-zinc-700 text-white min-h-[200px] resize-none"
           />
         </section>
@@ -36,13 +116,19 @@ export default function CommunityAssistant() {
 
           <Textarea
             placeholder="Paste docs, links, or notes here..."
+            value={docsPrompt}
+            onChange={(e) => setDocsPrompt(e.target.value)}
             className="bg-zinc-900/50 border-zinc-700 text-white min-h-[200px] resize-none"
           />
         </section>
 
-        {/* ---------- Shared Save Button ---------- */}
+        {/* ---------- Save Button ---------- */}
         <div className="flex justify-start">
-          <Button className="bg-zinc-700 hover:bg-zinc-600 text-white">
+          <Button
+            onClick={handleSave}
+            className="bg-white text-black hover:bg-zinc-200 font-semibold px-8 py-2 transition-all duration-200 hover:scale-105 cursor-pointer"
+          >
+            <Settings className="w-4 h-4 mr-2" />
             Save
           </Button>
         </div>

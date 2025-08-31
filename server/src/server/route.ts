@@ -86,4 +86,79 @@ router.post("/set-moderation-config", async (req: Request, res: Response) => {
     }
 });
 
+router.post("/get-moderation-config", async (req: Request, res: Response) => {
+    const { serverID, walletID } = req.body;
+
+    try{
+        const response = await prisma.server.findFirst({
+            where: {
+                serverID: serverID,
+                walletID: walletID
+            }
+        })
+
+        res.status(200).json({
+            strictnessLevel: response?.strictnessLevel,
+            bannedWords: response?.bannedWords
+        })
+    }
+    catch(e){
+        console.error(e);
+        res.status(500).json({
+            msg: "Unable to get config for: " + serverID
+        })
+    }
+});
+
+router.post("/set-chatbot-prompt", async (req: Request, res: Response) => {
+    const { serverID, walletID, personaPrompt, docsPrompt } = req.body;
+
+    try{
+        await prisma.server.update({
+            where: {
+                serverID: serverID,
+                walletID: walletID
+            },
+            data: {
+                personaPrompt: personaPrompt,
+                docsPrompt: docsPrompt
+            }
+        })
+        
+        res.status(200).json({
+            msg: "Chatbot Prompts set for: " + serverID
+        })
+    }
+    catch(e){
+        console.error(e);
+        res.status(500).json({
+            msg: "Unable to set prompts for: " + serverID
+        })
+    }
+});
+
+router.post("/get-chatbot-prompt", async (req: Request, res: Response) => {
+    const { serverID, walletID } = req.body;
+
+    try{
+        const response = await prisma.server.findFirst({
+            where: {
+                serverID: serverID,
+                walletID: walletID
+            }
+        })
+        
+        res.status(200).json({
+            personaPrompt: response?.personaPrompt,
+            docsPrompt: response?.docsPrompt
+        })
+    }
+    catch(e){
+        console.error(e);
+        res.status(500).json({
+            msg: "Unable to get prompts for: " + serverID
+        })
+    }
+});
+
 export default router;

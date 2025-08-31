@@ -4,8 +4,9 @@ import dotenv from "dotenv";
 import { sendMessageforModeration } from "../ao/connect";
 
 dotenv.config();
-
 const prisma = new PrismaClient();
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_API_URL = process.env.GROQ_API_URL;
 
 if (!process.env.TELEGRAM_BOT_TOKEN) {
   throw new Error("TELEGRAM_BOT_TOKEN not found!");
@@ -46,8 +47,15 @@ bot.command("link", async (ctx) => {
     }
 
     // Create TelegramServer and link to existing Server
-    await prisma.telegramServer.create({
-      data: {
+    await prisma.telegramServer.upsert({
+      where: { chatID: chatId },
+      update: { 
+        chatID: chatId,
+        server: {
+          connect: { serverID: serverID }
+        }  
+      },
+      create: {
         chatID: chatId,
         server: {
           connect: { serverID: serverID },
@@ -59,6 +67,64 @@ bot.command("link", async (ctx) => {
   } catch (e) {
     console.error("Error linking server:", e);
     await ctx.reply("Unable to link server!");
+  }
+});
+
+// ===============================
+// Ask Command
+// ===============================
+bot.command("ask", async (ctx) => {
+  const chatId = ctx.chat.id
+  const userPrompt = ctx.message.text;
+
+  if (!userPrompt) {
+    return bot.telegram.sendMessage(chatId, "Please provide a question after /ask")
+  }
+
+  try {
+    //Send typing action
+    await ctx.telegram.sendChatAction(ctx.chat.id, "typing");
+
+    const serverData = await prisma.server.findFirst({
+      where: {
+        telegramInfo: {
+          chatID: String(chatId),
+        },
+      },
+    })
+
+    // Call Groq API
+    const response = await fetch(GROQ_API_URL!, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            "content": "You are an AI assistant combining official documentation, community knowledge, and your own reasoning. Keep responses concise and plaintext only unless the user asks for detailed explanations.\n\nRules:\n- Be clear, concise, and technically accurate.\n- Act like a mentor; explain step-by-step only if asked.\n- Use community docs first; reason only if necessary.\n- Give examples or code snippets only if requested.\n- Never hallucinate APIs or facts.\n- Ask clarifying questions if the user query is ambiguous.\n\nResponse style:\n- Direct answer first, followed by optional context only if requested.\n- Keep all responses plaintext; no markdown or formatting unless user asks.\n\nGoal:\n- Provide clear, structured, and correct answers that help users solve problems while staying concise."
+          },
+          { role: "system", content: serverData?.personaPrompt || "" },
+          { role: "system", content: serverData?.docsPrompt || "" },
+          { role: "user", content: userPrompt },
+        ],
+      }),
+    })
+
+    if(!response.ok){
+      throw new Error("Unable to generate response");
+    }
+
+    const data: any = await response.json()
+
+    const replyText = data?.choices?.[0]?.message?.content || "No response generated."
+    await ctx.reply(replyText, { parse_mode: "Markdown" })
+  } catch (e) {
+    console.error(e)
+    await ctx.reply("Unable to generate a response!")
   }
 });
 

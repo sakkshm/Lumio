@@ -173,47 +173,54 @@ export default function Moderations() {
             </CardContent>
           </Card>
 
-          {/* Custom Blocked Words */}
-          <Card className="bg-zinc-950/50 border-zinc-800">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Ban className="w-5 h-5" /> Custom Word Filter
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex flex-col">
-                <div className="flex flex-wrap items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-md px-3 py-3 focus-within:border-white/20">
-                  {tags.map((tag, idx) => (
-                    <Badge
-                      key={idx}
-                      className="bg-zinc-800 text-white border border-zinc-600 px-2 py-1 flex items-center gap-2"
-                    >
-                      {tag}
-                      <button
-                        onClick={() => removeTag(tag)}
-                        className="ml-1 text-xs text-zinc-400 hover:text-white"
-                      >
-                        ✕
-                      </button>
-                    </Badge>
-                  ))}
-                  <input
-                    type="text"
-                    placeholder="Type a word..."
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="flex-1 bg-transparent text-white placeholder:text-zinc-500 outline-none py-2"
-                  />
-                </div>
-                <p className="text-xs text-zinc-500 mt-2">
-                  Type a word and press <span className="text-white">Enter</span> or{" "}
-                  <span className="text-white">Comma</span> to add it as a tag.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Custom Blocked Words */}
+<Card className="bg-zinc-950/50 border-zinc-800">
+  <CardHeader>
+    <CardTitle className="text-white flex items-center gap-2">
+      <Ban className="w-5 h-5" /> Custom Word Filter
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-6">
+    <div className="flex flex-col gap-3">
+      
+      {/* Tags show above input */}
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag, idx) => (
+          <Badge
+            key={idx}
+            className="bg-zinc-800 text-white border border-zinc-600 px-2 py-1 flex items-center gap-2"
+          >
+            {tag}
+            <button
+              onClick={() => removeTag(tag)}
+              className="ml-1 text-xs text-zinc-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </Badge>
+        ))}
+      </div>
+
+      {/* Input below */}
+      <input
+        type="text"
+        placeholder="Type a word..."
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        className="w-full bg-zinc-900 border border-zinc-700 text-white 
+                   placeholder:text-zinc-500 rounded-md px-3 py-2 
+                   outline-none focus:border-white/20 h-15"
+      />
+      
+      <p className="text-xs text-zinc-500">
+        Type a word and press <span className="text-white">Enter</span> or{" "}
+        <span className="text-white">,</span> to add it as a tag.
+      </p>
+    </div>
+  </CardContent>
+</Card>
+    </div>
 
         {/* Save Button */}
         <div className="flex justify-end">

@@ -144,23 +144,12 @@ bot.start()`
 {/* Description */}
 <p className="text-zinc-400 text-lg mb-4">{platform.description}</p>
 
-{/* Features */}
-<div className="flex flex-wrap gap-2 justify-center mb-6">
-  {platform.features.map((feature) => (
-    <span 
-      key={feature} 
-      className="px-4 py-2 bg-zinc-800/50 text-zinc-300 rounded text-base"
-    >
-      {feature}
-    </span>
-  ))}
-</div>
 
 
         {/* Button */}
         <Button
           onClick={() => handlePlatformClick(platform)}
-          className="w-full border border-zinc-500 bg-zinc-950 text-zinc-500 hover:bg-zinc-800 font-medium py-2 rounded-lg"
+          className="w-full border border-zinc-500 bg-zinc-950 text-zinc-500 hover:bg-zinc-800 font-medium py-2 mt-6 rounded-lg"
         >
           {platform.name === "Telegram" ? "Add to Community" : "Add to Server"}
         </Button>

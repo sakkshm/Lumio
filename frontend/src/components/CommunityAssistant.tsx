@@ -138,5 +138,6 @@ export default function CommunityAssistant() {
         </div>
       </div>
     </div>
+    </div>
   )
 }

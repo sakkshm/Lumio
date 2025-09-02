@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "tsx": "3.12.7"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -23,6 +23,6 @@
     "telegraf": "^4.16.3"
   },
   "scripts": {
-    "start": "tsx index.ts"
+    "start": "tsx src/index.ts"
   }
 }

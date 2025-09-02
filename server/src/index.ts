@@ -11,7 +11,8 @@ import serveRouter from "./server/route";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+// Convert PORT to number - process.env.PORT is always a string
+const PORT: number = parseInt(process.env.PORT || "3000", 10);
 
 //Launch bots
 telegram.launch();
@@ -27,6 +28,7 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Server running....")
 })
 
-app.listen(PORT, () => {
-    console.log("Server started at http://localhost:3000")
+// Important: Listen on 0.0.0.0 for Railway
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server started at http://0.0.0.0:${PORT}`)
 })

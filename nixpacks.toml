@@ -6,4 +6,4 @@ packages = ["nodejs", "npm"]
 command = "cd server && npm install && npm install -g tsx"
 
 [phases.start]
-command = "tsx src/index.ts"
+command = "cd server && tsx index.ts"

@@ -1,6 +1,8 @@
 import express, { type Request, type Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { setModerationConfig } from "../ao/connect";
+import { getDiscordMemberCount } from "../discord/discord";
+import { getTelegramMemberCount } from "../telegram/telegram";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -160,5 +162,93 @@ router.post("/get-chatbot-prompt", async (req: Request, res: Response) => {
         })
     }
 });
+
+router.post("/set-onboarding-message", async (req: Request, res: Response) => {
+    const { serverID, walletID, onboardingMessage } = req.body;
+
+    try{
+        await prisma.server.update({
+            where: {
+                serverID: serverID,
+                walletID: walletID
+            },
+            data: {
+                onboardingMessage: onboardingMessage
+            }
+        })
+        
+        res.status(200).json({
+            msg: "Onboarding message set for: " + serverID
+        })
+    }
+    catch(e){
+        console.error(e);
+        res.status(500).json({
+            msg: "Unable to set Onboarding message for: " + serverID
+        })
+    }
+});
+
+router.post("/get-onboarding-message", async (req: Request, res: Response) => {
+    const { serverID, walletID } = req.body;
+
+    try{
+        const response = await prisma.server.findFirst({
+            where: {
+                serverID: serverID,
+                walletID: walletID
+            }
+        })
+        
+        res.status(200).json({
+            onboardingMessage: response?.onboardingMessage
+        })
+    }
+    catch(e){
+        console.error(e);
+        res.status(500).json({
+            msg: "Unable to get Onboarding message for: " + serverID
+        })
+    }
+});
+
+router.post("/get-analytics", async (req: Request, res: Response) => {
+    const { serverID, walletID } = req.body;
+
+    try{
+        const response = await prisma.server.findFirst({
+            where: {
+                serverID: serverID,
+                walletID: walletID
+            },
+            include: {
+                telegramInfo: true,
+                discordInfo: true
+            }
+        })
+
+        if (!response) throw new Error();
+
+        const discordMemberCount = await getDiscordMemberCount(response?.discordInfo?.guildID!);
+        const telegramMemberCount = await getTelegramMemberCount(parseInt(response?.telegramInfo?.chatID!));
+
+        const discordMessageCount = response.discordInfo?.messageCount;
+        const telegramMessageCount = response.telegramInfo?.messageCount;
+
+        res.status(200).json({
+            discordMemberCount,
+            telegramMemberCount,
+            discordMessageCount,
+            telegramMessageCount
+        })
+    }
+    catch(e){
+        console.error(e);
+        res.status(500).json({
+            msg: "Unable to get analytics for: " + serverID
+        })
+    }
+});
+
 
 export default router;

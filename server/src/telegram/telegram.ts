@@ -128,10 +128,20 @@ bot.command("ask", async (ctx) => {
   }
 });
 
+
 // ===============================
 // Text Moderation
 // ===============================
 bot.on("text", async (ctx) => {
+
+  prisma.telegramServer.update({
+    where: { chatID: ctx.chat.id.toString() },
+    data: { messageCount: { increment: 1 } }
+  }).catch(err => {
+    console.error("Failed to increment message count:", err);
+  });
+
+
   console.log("Sending for moderation: " + ctx.message.text);
 
   //get serverid
@@ -226,10 +236,24 @@ async function isAdmin(ctx: any) {
   }
 }
 
+async function getTelegramMemberCount(chatId: number) {
+  try{
+    const memberCount = await bot.telegram.getChatMembersCount(chatId);
+    return memberCount;
+  }
+  catch(e){
+    console.error("Unable to get member count!");
+    return 0;
+  }
+}
+
 // ===============================
 // Graceful stop
 // ===============================
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
-export default bot;
+export {
+  bot as telegram,
+  getTelegramMemberCount
+}

@@ -1,8 +1,8 @@
 import express, { type Request, type Response } from "express"
 import cors from "cors";
 
-import telegram from "./telegram/telegram"
-import discord from "./discord/discord"
+import { telegram } from "./telegram/telegram"
+import { discord } from "./discord/discord"
 
 import dotenv from 'dotenv';
 import { getModerationResponses } from "./ao/response";

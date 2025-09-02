@@ -10,6 +10,7 @@ datasource db {
 model Server {
   serverID      String           @id
   walletID      String
+
   name          String
   description   String?
   createdAt     DateTime         @default(now())
@@ -21,6 +22,9 @@ model Server {
   //AI prompts
   personaPrompt String?
   docsPrompt  String?
+
+  //Community Engagement
+  onboardingMessage String?
 
   discordInfo   DiscordServer?   @relation("DiscordRelation")
   telegramInfo  TelegramServer?  @relation("TelegramRelation")
@@ -34,6 +38,8 @@ model DiscordServer {
   otherInfo Json?
   createdAt DateTime @default(now())
 
+  messageCount Int  @default(0)
+
   server    Server   @relation("DiscordRelation", fields: [serverID], references: [serverID])
 }
 
@@ -43,6 +49,8 @@ model TelegramServer {
   chatID    String   @unique
   otherInfo Json?
   createdAt DateTime @default(now())
+
+  messageCount Int @default(0)
 
   server    Server   @relation("TelegramRelation", fields: [serverID], references: [serverID])
 }

@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, PermissionsBitField } from "discord.js";
+import { Client, Events, GatewayIntentBits, PermissionsBitField } from "discord.js";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { sendMessageforModeration } from "../ao/connect";
@@ -23,11 +23,56 @@ bot.once("ready", () => {
   console.log(`Discord Bot Logged in as ${bot.user.tag}`);
 });
 
+// Onboarding/Welcome message
+bot.on(Events.GuildMemberAdd, async (member) => {
+  try {
+    // Look up onboarding message for this guild
+    const response = await prisma.server.findFirst({
+      where: {
+        discordInfo: {
+          guildID: String(member.guild.id),
+        },
+      },
+    });
+
+    if (!response || !response.onboardingMessage) {
+      console.error("No onboarding message found for this server!");
+      return;
+    }
+
+    // Send DM to the new member
+    try {
+      await member.send(response.onboardingMessage);
+      console.log(`Sent onboarding DM to ${member.user.tag}`);
+    } catch (err: any) {
+      console.error(
+        `Could not send DM to ${member.user.tag}:`,
+        err.message || err
+      );
+    }
+  } catch (e) {
+    console.error("Error handling new member:", e);
+  }
+});
+
 bot.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   // Only allow in servers
   if (!message.guild) return;
+
+  prisma.discordServer.update({
+    where: {
+      guildID: message.guild.id
+    },
+    data: {
+      messageCount: {
+        increment: 1
+      }
+    }
+  }).catch(err => {
+    console.error("Failed to increment message count:", err);
+  });
 
   // Command trigger
   if (message.content.startsWith("!link")) {
@@ -196,5 +241,15 @@ export async function handleDiscordMessageModerationResult(
   }
 }
 
+async function getDiscordMemberCount(guildID: string) {
+  const guild = bot.guilds.cache.get(guildID);
+  if (!guild) return;
 
-export default bot;
+  const totalMembers = guild.memberCount;
+  return totalMembers;
+}
+
+export {
+  bot as discord,
+  getDiscordMemberCount
+}

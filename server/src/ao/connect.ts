@@ -19,11 +19,13 @@ function jwkToPem(jwk: any): string {
   try {
     console.log('Converting JWK to PEM format...');
     
+    // Create a KeyObject from the JWK
     const keyObject = crypto.createPrivateKey({
       key: jwk,
       format: 'jwk'
     });
     
+    // Export as PEM
     const pemKey = keyObject.export({
       type: 'pkcs8',
       format: 'pem'
@@ -56,7 +58,7 @@ function validateWallet(wallet: any) {
   return wallet;
 }
 
-// Async wallet loader with caching - Updated for Railway JSON variables
+// Async wallet loader with caching
 let walletCache: any = null;
 
 async function getWallet(): Promise<any> {
@@ -65,23 +67,10 @@ async function getWallet(): Promise<any> {
   try {
     let jwkWallet;
     
-    // Check for Railway JSON variable first
     if (process.env.WALLET_JSON) {
-      console.log('Loading wallet from Railway JSON environment variable...');
-      
-      // Try to parse as JSON first (Railway JSON variable)
-      try {
-        jwkWallet = typeof process.env.WALLET_JSON === 'string' 
-          ? JSON.parse(process.env.WALLET_JSON) 
-          : process.env.WALLET_JSON;
-      } catch (parseError) {
-        console.error('Error parsing WALLET_JSON:', parseError);
-        throw new Error('Invalid WALLET_JSON format');
-      }
-      
-      jwkWallet = validateWallet(jwkWallet);
+      console.log('Loading wallet from environment variable...');
+      jwkWallet = validateWallet(JSON.parse(process.env.WALLET_JSON));
     } else {
-      // Fallback to file for local development
       console.log('Loading wallet from file...');
       const walletPath = path.join(__dirname, "wallet.json");
       jwkWallet = validateWallet(JSON.parse(readFileSync(walletPath).toString()));
@@ -103,7 +92,7 @@ async function getWallet(): Promise<any> {
   }
 }
 
-// Environment variable validation
+// Fix the undefined issue by adding validation
 const moderationProcessID = process.env.MODERATION_AO_PROCESS;
 if (!moderationProcessID) {
   throw new Error('MODERATION_AO_PROCESS environment variable is not set');

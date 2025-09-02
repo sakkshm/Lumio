@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
 import * as path from "path";
 import { addModerationMessage } from "./moderationMessageMap";
+import * as crypto from "node:crypto";
 
-const {
+import {
   result,
   results,
   message,
@@ -11,59 +12,158 @@ const {
   unmonitor,
   dryrun,
   createDataItemSigner
-} = require("@permaweb/aoconnect");
+} from "@permaweb/aoconnect/node";
 
-const walletPath = path.join(__dirname, "wallet.json");
-
-const wallet = JSON.parse(
-  readFileSync(walletPath).toString(),
-);
-
-const moderationProcessID = process.env.MODERATION_AO_PROCESS;
-
-
-export async function sendMessageforModeration(serverID: string, chatId: string, userId: string, chatMessageId: string, messageText: string, platform: string){
-
-    await message({
-        process: moderationProcessID,
-        tags: [
-            { name: "Action", value: "Moderate" },
-            { name: "Server", value: serverID },
-        ],
-        // A signer function used to build the message "signature"
-        signer: createDataItemSigner(wallet),
-        data: messageText
-    })
-    .then((messageId: string) => {
-        addModerationMessage(
-            messageId, 
-            serverID, 
-            chatId, 
-            userId, 
-            chatMessageId, 
-            messageText,
-            platform
-        )
-    })
-    .catch(console.error);
+// Function to convert JWK to PEM format
+function jwkToPem(jwk: any): string {
+  try {
+    console.log('Converting JWK to PEM format...');
+    
+    const keyObject = crypto.createPrivateKey({
+      key: jwk,
+      format: 'jwk'
+    });
+    
+    const pemKey = keyObject.export({
+      type: 'pkcs8',
+      format: 'pem'
+    });
+    
+    console.log('JWK to PEM conversion successful ✓');
+    return pemKey as string;
+  } catch (error) {
+    console.error('Error converting JWK to PEM:', error);
+    throw new Error(`Failed to convert JWK to PEM: ${error}`);
+  }
 }
 
-export async function setModerationConfig(serverID: string, strictness: string, bannedWords: string){
+// Wallet validation function
+function validateWallet(wallet: any) {
+  console.log('Validating wallet...');
+  const requiredFields = ['kty', 'n', 'e', 'd', 'p', 'q', 'dp', 'dq', 'qi'];
+  
+  for (const field of requiredFields) {
+    if (!wallet[field]) {
+      throw new Error(`Missing required field: ${field}`);
+    }
+  }
+  
+  if (wallet.kty !== 'RSA') {
+    throw new Error(`Unsupported key type: ${wallet.kty}`);
+  }
+  
+  console.log('Wallet validation passed ✓');
+  return wallet;
+}
 
-    await message({
-        process: moderationProcessID,
-        tags: [
-            { name: "Action", value: "SetConfig" },
-            { name: "Server", value: serverID },
-            { name: "Strictness", value: strictness.toString() },
-            { name: "BannedWords", value: bannedWords },
-        ],
-        // A signer function used to build the message "signature"
-        signer: createDataItemSigner(wallet),
-        data: ""
-    })
-    .then((messageId: string) => {
-        console.log("Config set:", messageId)
-    })
-    .catch(console.error);
+// Async wallet loader with caching - Updated for Railway JSON variables
+let walletCache: any = null;
+
+async function getWallet(): Promise<any> {
+  if (walletCache) return walletCache;
+  
+  try {
+    let jwkWallet;
+    
+    // Check for Railway JSON variable first
+    if (process.env.WALLET_JSON) {
+      console.log('Loading wallet from Railway JSON environment variable...');
+      
+      // Try to parse as JSON first (Railway JSON variable)
+      try {
+        jwkWallet = typeof process.env.WALLET_JSON === 'string' 
+          ? JSON.parse(process.env.WALLET_JSON) 
+          : process.env.WALLET_JSON;
+      } catch (parseError) {
+        console.error('Error parsing WALLET_JSON:', parseError);
+        throw new Error('Invalid WALLET_JSON format');
+      }
+      
+      jwkWallet = validateWallet(jwkWallet);
+    } else {
+      // Fallback to file for local development
+      console.log('Loading wallet from file...');
+      const walletPath = path.join(__dirname, "wallet.json");
+      jwkWallet = validateWallet(JSON.parse(readFileSync(walletPath).toString()));
+    }
+    
+    // Convert JWK to PEM format for aoconnect compatibility
+    const pemKey = jwkToPem(jwkWallet);
+    
+    // Cache the converted wallet
+    walletCache = {
+      ...jwkWallet,
+      pemKey: pemKey
+    };
+    
+    return walletCache;
+  } catch (error) {
+    console.error('Error loading wallet:', error);
+    throw error;
+  }
+}
+
+// Environment variable validation
+const moderationProcessID = process.env.MODERATION_AO_PROCESS;
+if (!moderationProcessID) {
+  throw new Error('MODERATION_AO_PROCESS environment variable is not set');
+}
+
+export async function sendMessageforModeration(
+  serverID: string, 
+  chatId: string, 
+  userId: string, 
+  chatMessageId: string, 
+  messageText: string, 
+  platform: string
+) {
+  try {
+    const wallet = await getWallet();
+    console.log('Sending message for moderation:', messageText);
+    
+    const messageId = await message({
+      process: moderationProcessID!,
+      tags: [
+        { name: "Action", value: "Moderate" },
+        { name: "Server", value: serverID },
+      ],
+      signer: createDataItemSigner(wallet),
+      data: messageText
+    });
+    
+    console.log('Message sent successfully:', messageId);
+    addModerationMessage(messageId, serverID, chatId, userId, chatMessageId, messageText, platform);
+    
+  } catch (error) {
+    console.error('Error in sendMessageforModeration:', error);
+    throw error;
+  }
+}
+
+export async function setModerationConfig(
+  serverID: string, 
+  strictness: string, 
+  bannedWords: string
+) {
+  try {
+    const wallet = await getWallet();
+    console.log('Setting moderation config...');
+    
+    const messageId = await message({
+      process: moderationProcessID!,
+      tags: [
+        { name: "Action", value: "SetConfig" },
+        { name: "Server", value: serverID },
+        { name: "Strictness", value: strictness.toString() },
+        { name: "BannedWords", value: bannedWords },
+      ],
+      signer: createDataItemSigner(wallet),
+      data: ""
+    });
+    
+    console.log("Config set:", messageId);
+  } catch (error) {
+    console.error('Error in setModerationConfig:', error);
+    throw error;
+  }
 }

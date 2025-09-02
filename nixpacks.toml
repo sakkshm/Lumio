@@ -5,7 +5,7 @@ build_dir = "server"
 packages = ["nodejs", "npm"]
 
 [phases.build]
-command = "npm install && npm install tsx --save-dev"
+command = "npm install"
 
 [phases.start]
-command = "./node_modules/.bin/tsx src/index.ts"
+command = "npm start"

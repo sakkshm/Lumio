@@ -2,8 +2,7 @@
 build_dir = "server"
 
 [phases.setup]
-packages = ["nodejs", "npm"]
-
+packages = ["nodejs-20", "npm"]
 [phases.build]
 command = "npm install"
 

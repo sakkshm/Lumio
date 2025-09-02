@@ -1,17 +1,12 @@
+[project]
+# Set the build directory to your server folder
+build_dir = "server"
+
 [phases.setup]
-# Install curl and build tools needed to install Node
-packages = ["curl", "build-essential"]
+packages = ["nodejs", "npm"]  # install Node and npm
 
 [phases.build]
-# Install Node 20, npm, then install project deps and tsx
-command = """
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-apt-get install -y nodejs
-cd server
-npm install
-npm install -g tsx
-"""
+command = "npm install && npm install -g tsx"
 
 [phases.start]
-# Start your server
-command = "cd server && tsx src/index.ts"
+command = "tsx src/index.ts"

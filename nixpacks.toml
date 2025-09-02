@@ -1,12 +1,11 @@
 [project]
-# Set the build directory to your server folder
 build_dir = "server"
 
 [phases.setup]
-packages = ["nodejs", "npm"]  # install Node and npm
+packages = ["nodejs", "npm"]
 
 [phases.build]
-command = "npm install && npm install -g tsx"
+command = "npm install && npm install tsx --save-dev"
 
 [phases.start]
-command = "tsx src/index.ts"
+command = "./node_modules/.bin/tsx src/index.ts"

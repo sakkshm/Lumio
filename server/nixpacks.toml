@@ -1,0 +1,9 @@
+[phases.setup]
+# Install Node.js and npm
+packages = ["nodejs", "npm"]
+
+[phases.build]
+command = "cd server && npm install && npm install -g tsx"
+
+[phases.start]
+command = "tsx src/index.ts"

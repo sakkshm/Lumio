@@ -12,6 +12,7 @@ import Login from "./login";
 import ProtectedRoute from "./components/protectedRoutes";
 import LandingPage from "./landing";
 import BotSelection from "./AppSelection";
+import Poll from "./Poll";  // 👉 import the Poll component
 
 // ✅ Sonner toast
 import { Toaster } from "sonner";
@@ -68,6 +69,15 @@ function Main() {
                 </ProtectedRoute>
               }
             />
+            <Route
+            path="/:serverId/server/:pollId/poll"
+            element={
+              <ProtectedRoute>
+                <Poll /> 
+              </ProtectedRoute>
+            }
+          />
+
           </Routes>
         </HashRouter>
       </ThemeProvider>

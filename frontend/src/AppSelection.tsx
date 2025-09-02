@@ -95,7 +95,7 @@ export default function Dashboard() {
     {/* ---------- Sidebar ---------- */}
     <aside className="fixed left-0 top-0 h-full w-64 bg-black/30 backdrop-blur-md flex flex-col border-r border-zinc-800">
     <div
-    className="absolute inset-0 opacity-50 pointer-events-none"
+    className="absolute inset-0 opacity-0 pointer-events-none"
     style={{
       backgroundImage: `url(${noise})`,
       backgroundSize: "cover",

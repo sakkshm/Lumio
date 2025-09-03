@@ -13,7 +13,7 @@ import { ServerCardSkeleton } from "./components/ServerCardSkeleton"
 import noise from "@/components/noisy.png"
 
 // API endpoint
-const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`
+const SERVERS_API_URL = `https://readily-certain-ant.ngrok-free.app/server`
 
 // Server type definition
 interface ServerType {

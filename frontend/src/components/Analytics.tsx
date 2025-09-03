@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 const MEMBER_COLORS = ["#0088FE", "#00C49F"]
-const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`
+const SERVERS_API_URL = `https://readily-certain-ant.ngrok-free.app/server`
 
 export default function Analytics() {
   const [memberData, setMemberData] = useState([

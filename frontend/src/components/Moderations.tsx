@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router-dom";
 
-const SERVERS_API_URL = `${import.meta.env.VITE_BACKEND_URL}/server`
+const SERVERS_API_URL = `https://readily-certain-ant.ngrok-free.app/server`
 
 export default function Moderations() {
   const [selectedLevel, setSelectedLevel] = useState<number>(1)

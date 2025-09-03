@@ -73,8 +73,8 @@ export default function LumioLandingPage() {
                 Lumio powers AI-driven community management on the <span className="text-white">Permaweb</span>, unifying
                 networks and enabling autonomous governance.
               </p>
-
-              <Button className="bg-black hover:bg-black text-white border border-gray-600 rounded-full px-8 py-3 cursor-pointer">
+                          
+              <Button onClick={() => navigate("/login")} className="bg-black hover:bg-black text-white border border-gray-600 rounded-full px-8 py-3 cursor-pointer">
                 Add to Server
               </Button>
             </div>
@@ -250,17 +250,6 @@ export default function LumioLandingPage() {
 </section>
 
 
-        {/* Partner Logos */}
-        <section className="px-8 mb-20">
-          <div className="flex items-center justify-center space-x-12 opacity-60">
-            <div className="text-2xl font-bold">logoipsum</div>
-            <div className="text-2xl font-bold">LUMIO</div>
-            <div className="text-2xl font-bold">○</div>
-            <div className="text-2xl font-bold">∞</div>
-            <div className="text-2xl font-bold">Logoipsum</div>
-            <div className="text-2xl font-bold">LOGO</div>
-          </div>
-        </section>
 
         {/* Features Section */}
         <section className="px-8 mb-20">

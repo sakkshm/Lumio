@@ -1,8 +1,8 @@
 import express, { type Request, type Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { setModerationConfig } from "../ao/connect";
-import { getDiscordMemberCount } from "../discord/discord";
-import { getTelegramMemberCount } from "../telegram/telegram";
+import { setModerationConfig } from "../ao/connect.js";
+import { getDiscordMemberCount } from "../discord/discord.js";
+import { getTelegramMemberCount } from "../telegram/telegram.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();

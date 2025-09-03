@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { sendMessageforModeration } from "../ao/connect";
+import { sendMessageforModeration } from "../ao/connect.js";
 
 dotenv.config();
 const prisma = new PrismaClient();

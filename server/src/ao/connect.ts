@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import * as path from "path";
-import { addModerationMessage } from "./moderationMessageMap";
+import { addModerationMessage } from "./moderationMessageMap.js";
 
 const {
   result,

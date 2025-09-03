@@ -1,7 +1,7 @@
 import { result } from "@permaweb/aoconnect";
-import { moderationMessageMap, removeModerationMessage } from "./moderationMessageMap";
-import { handleTelegramMessageModerationResult } from "../telegram/telegram";
-import { handleDiscordMessageModerationResult } from "../discord/discord";
+import { moderationMessageMap, removeModerationMessage } from "./moderationMessageMap.js";
+import { handleTelegramMessageModerationResult } from "../telegram/telegram.js";
+import { handleDiscordMessageModerationResult } from "../discord/discord.js";
 
 const responsePromises = new Map();
 
@@ -16,7 +16,7 @@ export function getModerationResponses(){
     const map = moderationMessageMap;
     const moderationProcessID = process.env.MODERATION_AO_PROCESS!;
 
-    map.forEach(async (value, key) => {
+    map.forEach(async (value: any, key: any) => {
         try{
             if(!responsePromises.has(key)){
                 console.log("Adding responseHandler for: " + key);

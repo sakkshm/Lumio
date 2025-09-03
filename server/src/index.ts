@@ -1,12 +1,12 @@
 import express, { type Request, type Response } from "express"
 import cors from "cors";
 
-import { telegram } from "./telegram/telegram"
-import { discord } from "./discord/discord"
+import { telegram } from "./telegram/telegram.js"
+import { discord } from "./discord/discord.js"
 
 import dotenv from 'dotenv';
-import { getModerationResponses } from "./ao/response";
-import serveRouter from "./server/route";
+import { getModerationResponses } from "./ao/response.js";
+import serveRouter from "./server/route.js";
 
 dotenv.config();
 

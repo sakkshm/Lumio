@@ -22,8 +22,7 @@ function Main() {
     <ArweaveWalletKit
       config={{
         appInfo: {
-          name: "ArAO Starter",
-          logo: "t8cPU_PWjdLXRBAN89nzb9JQoRAf5ZBF2kkTZoxtJPc",
+          name: "Lumio",
         },
         strategies: [
           new WanderStrategy(),

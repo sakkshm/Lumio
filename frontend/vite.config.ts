@@ -4,7 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 import path from "path"
 import { nodePolyfills } from "vite-plugin-node-polyfills"
 
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), nodePolyfills()],
@@ -13,5 +12,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "./"
+  base: "./",
+  server: {
+    host: true, // listen on all addresses
+    allowedHosts: [
+      '.ngrok-free.app' // allow all ngrok subdomains
+    ]
+  }
 })

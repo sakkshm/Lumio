@@ -1,7 +1,7 @@
 import { Client, Events, GatewayIntentBits, PermissionsBitField } from "discord.js";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
-import { sendMessageforModeration } from "../ao/connect";
+import { sendMessageforModeration } from "../ao/connect.js";
 
 dotenv.config();
 const prisma = new PrismaClient();

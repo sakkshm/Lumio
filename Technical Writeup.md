@@ -185,9 +185,10 @@ Lumio enhances communities with an AI-powered knowledge assistant.
 ## VIII. Future Roadmap and Extensibility
 ### Planned Enhancements
 
-* Advanced analytics with Arweave data.
-* Gamification (XP, leaderboards, achievements).
-* Enhanced onboarding with automated sequences.
+* **Permanent Logs** – Stores moderation actions and chat history immutably on Arweave.  
+* **Engagement Tools** – Polls, bounties, XP system, stickers, and leaderboards.  
+* **Onboarding & Announcements** – Welcomes new members, posts product updates, and guides users.  
+* **Archival Agent** – Maintains a permanent community archive accessible forever.  
 
 ### Technical Improvements
 

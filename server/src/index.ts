@@ -15,7 +15,7 @@ const app = express();
 const PORT: number = parseInt(process.env.PORT || "3000", 10);
 
 //Launch bots
-telegram.launch();
+//telegram.launch();
 discord.login(process.env.DISCORD_BOT_TOKEN);
 
 setInterval(getModerationResponses, 5000);

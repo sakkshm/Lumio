@@ -1,4 +1,14 @@
-import { ChannelType, Client, Events, GatewayIntentBits, PermissionsBitField, TextChannel } from "discord.js";
+import {
+  ChannelType,
+  Client,
+  Events,
+  GatewayIntentBits,
+  PermissionsBitField,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  TextChannel,
+} from "discord.js";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { sendMessageforModeration } from "../ao/connect.js";
@@ -7,27 +17,67 @@ dotenv.config();
 const prisma = new PrismaClient();
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_API_URL = process.env.GROQ_API_URL;
+const DISCORD_TOKEN = process.env.DISCORD_BOT_TOKEN!;
+const CLIENT_ID = process.env.DISCORD_CLIENT_ID!;
 
 const bot = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers, // Needed for onboarding messages
+    GatewayIntentBits.GuildMembers,
   ],
 });
 
-bot.once("ready", () => {
-  if (!bot.user) throw new Error("Discord bot cannot log in.");
-  console.log(`Discord Bot Logged in as ${bot.user.tag}`);
-});
+// ===============================
+// Slash Commands Registration
+// ===============================
+const commands = [
+  new SlashCommandBuilder()
+    .setName("link")
+    .setDescription("Link this Discord server with Lumio")
+    .addStringOption(option =>
+      option.setName("code")
+        .setDescription("The link code")
+        .setRequired(true)
+    ),
+  new SlashCommandBuilder()
+    .setName("ask")
+    .setDescription("Ask the Lumio AI Assistant")
+    .addStringOption(option =>
+      option.setName("question")
+        .setDescription("Your question for the AI assistant")
+        .setRequired(true)
+    ),
+].map(cmd => cmd.toJSON());
+
+const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
+
+async function registerCommands() {
+  try {
+    console.log("Registering application commands...");
+    await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
+    console.log("Discord commands registered globally");
+  } catch (error) {
+    console.error("Error registering commands:", error);
+  }
+}
 
 // ===============================
-// Utility: Escape Markdown for Discord
+// Utility: Escape Markdown
 // ===============================
 function escapeMarkdown(text: string) {
   return text.replace(/([*_`~])/g, "\\$1");
 }
+
+// ===============================
+// On Ready
+// ===============================
+bot.once("ready", async () => {
+  if (!bot.user) throw new Error("Discord bot cannot log in.");
+  console.log(`Discord Bot Logged in as ${bot.user.tag}`);
+  await registerCommands();
+});
 
 // ===============================
 // Onboarding/Welcome Message
@@ -38,12 +88,10 @@ bot.on(Events.GuildMemberAdd, async (member) => {
       where: { discordInfo: { guildID: String(member.guild.id) } },
     });
 
-    if (!serverData || !serverData.onboardingMessage) return;
+    if (!serverData?.onboardingMessage) return;
 
-    // Replace {user} placeholder with mention
     const welcomeMessage = serverData.onboardingMessage.replace("{user}", `${member.displayName}`);
 
-    // Send DM to the new member
     try {
       await member.send(escapeMarkdown(welcomeMessage));
       console.log(`Sent onboarding DM to ${member.user.tag}`);
@@ -56,58 +104,41 @@ bot.on(Events.GuildMemberAdd, async (member) => {
 });
 
 // ===============================
-// Message Handling
+// Slash Command Handling
 // ===============================
-bot.on("messageCreate", async (message) => {
-  if (message.author.bot) return;
-  if (!message.guild) return; // Only process messages in servers
+bot.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
 
-  // Increment message count
-  prisma.discordServer.update({
-    where: { guildID: message.guild.id },
-    data: { messageCount: { increment: 1 } },
-  }).catch(console.error);
+  // /link
+  if (interaction.commandName === "link") {
+    const code = interaction.options.getString("code", true);
+    const member = await interaction.guild!.members.fetch(interaction.user.id);
 
-  // -------------------------------
-  // !link Command
-  // -------------------------------
-  if (message.content.startsWith("!link")) {
-    const args = message.content.split(" ").slice(1);
-    const code = args[0];
-
-    if (!code) return message.reply("Please provide a code. Usage: `!link <code>`");
-
-    const member = await message.guild.members.fetch(message.author.id);
     if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      return message.reply("You must be an admin to use this command.");
+      return interaction.reply({ content: "You must be an admin to use this command.", ephemeral: true });
     }
-
-    const serverID = code;
-    const guildId = message.guild.id;
 
     try {
       await prisma.discordServer.upsert({
-        where: { guildID: guildId },
-        update: { guildID: guildId, server: { connect: { serverID } } },
-        create: { guildID: guildId, server: { connect: { serverID } } },
+        where: { guildID: interaction.guildId! },
+        update: { guildID: interaction.guildId!, server: { connect: { serverID: code } } },
+        create: { guildID: interaction.guildId!, server: { connect: { serverID: code } } },
       });
-      await message.reply("Your server is now linked to Lumio!");
+      await interaction.reply("Your server is now linked to Lumio!");
     } catch (e) {
       console.error(e);
-      await message.reply("Unable to link server!");
+      await interaction.reply("Unable to link server!");
     }
-    return;
   }
 
-  // -------------------------------
-  // !ask Command
-  // -------------------------------
-  if (message.content.startsWith("!ask")) {
-    await message.channel.sendTyping();
+  // /ask
+  if (interaction.commandName === "ask") {
+    const question = interaction.options.getString("question", true);
+    await interaction.deferReply();
 
     try {
       const serverData = await prisma.server.findFirst({
-        where: { discordInfo: { guildID: message.guild.id } },
+        where: { discordInfo: { guildID: interaction.guildId! } },
       });
 
       const response = await fetch(GROQ_API_URL!, {
@@ -119,13 +150,10 @@ bot.on("messageCreate", async (message) => {
         body: JSON.stringify({
           model: "llama-3.3-70b-versatile",
           messages: [
-            {
-              role: "system",
-              content: "You are an AI assistant combining official documentation, community knowledge, and your own reasoning. Keep responses concise and plaintext only unless the user asks for detailed explanations.\n\nRules:\n- Be clear, concise, and technically accurate.\n- Act like a mentor; explain step-by-step only if asked.\n- Use community docs first; reason only if necessary.\n- Give examples or code snippets only if requested.\n- Never hallucinate APIs or facts.\n- Ask clarifying questions if the user query is ambiguous.\n\nResponse style:\n- Direct answer first, followed by optional context only if requested.\n- Keep all responses plaintext; no markdown or formatting unless user asks.\n\nGoal:\n- Provide clear, structured, and correct answers that help users solve problems while staying concise."
-            },
+            { role: "system", content: "You are an AI assistant combining official documentation, community knowledge, and your own reasoning. Keep responses concise and plaintext only unless the user asks for detailed explanations.\n\nRules:\n- Be clear, concise, and technically accurate.\n- Act like a mentor; explain step-by-step only if asked.\n- Use community docs first; reason only if necessary.\n- Give examples or code snippets only if requested.\n- Never hallucinate APIs or facts.\n- Ask clarifying questions if the user query is ambiguous.\n\nResponse style:\n- Direct answer first, followed by optional context only if requested.\n- Keep all responses plaintext; no markdown or formatting unless user asks.\n\nGoal:\n- Provide clear, structured, and correct answers that help users solve problems while staying concise." },
             { role: "system", content: serverData?.personaPrompt || "" },
             { role: "system", content: serverData?.docsPrompt || "" },
-            { role: "user", content: message.content || "" },
+            { role: "user", content: question },
           ],
         }),
       });
@@ -133,23 +161,31 @@ bot.on("messageCreate", async (message) => {
       if (!response.ok) throw new Error("Unable to generate response");
       const data: any = await response.json();
       const replyText = data?.choices?.[0]?.message?.content || "No response generated.";
-      await message.reply(replyText);
+
+      await interaction.editReply(replyText);
     } catch (e) {
       console.error(e);
-      await message.reply("Unable to generate a response!");
+      await interaction.editReply("Unable to generate a response!");
     }
-    return;
   }
+});
 
-  // -------------------------------
-  // Moderation
-  // -------------------------------
+// ===============================
+// Message Moderation Relay
+// ===============================
+bot.on("messageCreate", async (message) => {
+  if (message.author.bot || !message.guild) return;
+
+  prisma.discordServer.update({
+    where: { guildID: message.guild.id },
+    data: { messageCount: { increment: 1 } },
+  }).catch(console.error);
+
   const serverData = await prisma.server.findFirst({
     where: { discordInfo: { is: { guildID: message.guild.id } } },
   });
 
   if (serverData) {
-    console.log("Sending message for moderation:", message.content);
     sendMessageforModeration(
       serverData.serverID,
       message.guild.id,
@@ -162,7 +198,7 @@ bot.on("messageCreate", async (message) => {
 });
 
 // ===============================
-// Launch Poll
+// Poll Command (exported function)
 // ===============================
 export async function launchDiscordPoll(
   guildId: string,
@@ -224,7 +260,6 @@ export async function handleDiscordMessageModerationResult(
     try {
       const guild = await bot.guilds.fetch(guildID);
       const member = await guild.members.fetch(userId);
-
       const channel = await guild.channels.fetch(member.guild.systemChannelId || chatMessageId);
 
       if (channel?.isTextBased()) {
@@ -240,7 +275,6 @@ export async function handleDiscordMessageModerationResult(
         .catch(() => {
           if (channel?.isTextBased()) channel.send(`Cannot ban Admin!`);
         });
-
     } catch (error) {
       console.error("Error banning user:", error);
     }
@@ -277,3 +311,8 @@ export {
   bot as discord,
   getDiscordMemberCount
 };
+
+// ===============================
+// Login
+// ===============================
+bot.login(DISCORD_TOKEN);

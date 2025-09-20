@@ -1,12 +1,13 @@
+// ================================
+// bun-node-ao.ts
+// ================================
+
+import 'dotenv/config'; // Loads .env variables
 import { readFileSync } from "node:fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { addModerationMessage } from "./moderationMessageMap.js";
-import {
-  message,
-  result,
-  createDataItemSigner,
-} from "@permaweb/aoconnect";
+import { message, result, createDataItemSigner } from "@permaweb/aoconnect";
 
 // --- Path setup ---
 const __filename = fileURLToPath(import.meta.url);
@@ -16,18 +17,22 @@ const __dirname = path.dirname(__filename);
 const walletPath = path.join(__dirname, "wallet.json");
 const wallet = JSON.parse(readFileSync(walletPath, "utf-8"));
 
-// --- AO Processes ---
+// --- AO Processes from .env ---
 const moderationProcessID = process.env.MODERATION_AO_PROCESS;
 const logProcessID = process.env.LOGS_AO_PROCESS;
 
 if (!moderationProcessID || !logProcessID) {
-  throw new Error("Process IDs not found in env!");
+  throw new Error("Process IDs not found in env! Make sure .env has MODERATION_AO_PROCESS and LOGS_AO_PROCESS");
 }
 
 // --- Helpers ---
 function sleep(ms: number) {
   return new Promise((res) => setTimeout(res, ms));
 }
+
+// ================================
+// Moderation functions
+// ================================
 
 /**
  * Send a message to moderation process
@@ -92,6 +97,10 @@ export async function setModerationConfig(
     console.error("setModerationConfig error:", err);
   }
 }
+
+// ================================
+// Logging functions
+// ================================
 
 /**
  * Store a log in AO

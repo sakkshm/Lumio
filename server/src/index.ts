@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from "express"
-import cors from "cors";
+//import cors from "cors";
 
 import { telegram } from "./telegram/telegram.js"
 import { discord } from "./discord/discord.js"
@@ -21,7 +21,7 @@ discord.login(process.env.DISCORD_BOT_TOKEN);
 setInterval(getModerationResponses, 5000);
 
 app.use(express.json());
-app.use(cors());
+//app.use(cors());
 
 app.use("/server", serveRouter);
 app.get("/", (req: Request, res: Response) => {

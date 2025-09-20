@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Settings } from "lucide-react"
 import {
   Wallet,
   LayoutDashboard,
@@ -10,7 +9,6 @@ import {
   Users,
   BarChart3,
   List,
-  Bell,
 } from "lucide-react"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import noise from "@/components/noisy.png"
@@ -22,10 +20,11 @@ import CommunityEngagement from "./components/CommunityEngagement"
 import Analytics from "./components/Analytics"
 import Logs from "./components/Logs"
 import BotSelectionSidebar from "./components/bot-selection-sidebar"
+import { useParams } from "react-router"
 
 export default function Dashboard() {
   const address = useActiveAddress()
-
+  const params = useParams()
   const [activeTab, setActiveTab] = useState("bot-selection")
   const [activeSubTab, setActiveSubTab] = useState("Onboarding")
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
@@ -81,6 +80,7 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
       setPolls={setPolls}
       isDialogOpen={isDialogOpen}
       setIsDialogOpen={setIsDialogOpen}
+      serverID={params.serverID}
     />
   )
 

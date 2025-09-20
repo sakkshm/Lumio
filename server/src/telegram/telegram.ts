@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { sendMessageforModeration } from "../ao/connect.js";
+import { sendMessageforModeration, storeLog } from "../ao/connect.js";
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -155,6 +155,13 @@ export async function handleTelegramMessageModerationResult(
       await bot.telegram.banChatMember(chatId, parseInt(userId), currentTimestamp + 100000);
 
       const bannedUser = await bot.telegram.getChatMember(chatId, parseInt(userId));
+      
+      await storeLog(
+        serverID,
+        "BAN",
+        `Banning ${bannedUser.user.first_name}\nReason: ${reason || "Policy violation"}`
+      )
+      
       await bot.telegram.sendMessage(
         chatId,
         `Banned: ${bannedUser.user.first_name}\nReason: ${reason || "Policy violation"}`

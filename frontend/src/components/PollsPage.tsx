@@ -38,6 +38,7 @@ export default function Polls({
   const [selectedPoll, setSelectedPoll] = React.useState<Poll | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [loadingPolls, setLoadingPolls] = React.useState(false)
+  const SERVERS_API_URL = `https://lumio-server.sakkshm.me/server`
 
   // --- Fetch polls from backend on mount ---
   const fetchPolls = async () => {
@@ -46,7 +47,7 @@ export default function Polls({
     if (!serverID || !walletID) return
     setLoadingPolls(true)
     try {
-      const res = await fetch("http://localhost:3000/server/get-polls", {
+      const res = await fetch(`${SERVERS_API_URL}/get-polls`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ serverID, walletID }),
@@ -96,7 +97,7 @@ export default function Polls({
 
     setSaving(true)
     try {
-      const res = await fetch("http://localhost:3000/server/post-poll", {
+      const res = await fetch(`${SERVERS_API_URL}/post-poll`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

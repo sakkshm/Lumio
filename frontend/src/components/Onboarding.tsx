@@ -87,9 +87,15 @@ if (loading) {
           <h2 className="text-xl font-semibold text-white mb-2">
             Onboarding Setup
           </h2>
-          <p className="text-zinc-400 mb-6">
-            Enter onboarding message for your community (markdown supported), type {"{user}"} to mention new users first name.
-          </p>
+          <div className="mb-6">
+            <p className="text-zinc-400">
+              Craft the welcome message that new members will see the moment they join. 
+              To personalize it, type <code>{"{user}"}</code> to automatically add their first name.
+            </p>
+            <p className="text-xs text-zinc-500 mt-2">
+              Example: "Hey {"{user}"}!" becomes "Hey Alex!". Markdown is supported.
+            </p>
+          </div>
 
           <Textarea
             placeholder="Write your onboarding message here..."

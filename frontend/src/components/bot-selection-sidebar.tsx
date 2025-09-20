@@ -3,7 +3,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { X, ExternalLink } from "lucide-react"
+import { X, Copy, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
 import disnew from "./discordNew.jpg"
 import telenew from "./teleNew.jpg"
@@ -25,16 +25,19 @@ interface Platform {
 
 export default function BotSelectionSidebar({ className }: BotSelectionSidebarProps) {
   const navigate = useNavigate()
-  const { serverId } = useParams()  // ✅ get serverId from route
+  const { serverId } = useParams()
   const [showPopup, setShowPopup] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null)
+  
+  const DISCORD_BOT_INVITE_LINK = "https://discord.com/oauth2/authorize?client_id=1407680030221537280&permissions=8&integration_type=0&scope=bot";
+
 
   const platforms = [
     {
       id: "telegram",
       name: "Telegram",
       description: "Deploy bots for Telegram messaging platform",
-      features: ["Messaging", "Groups", "Channels"], // Add relevant features
+      features: ["Messaging", "Groups", "Channels"],
       status: "Active",
       logo: telenew,
       link: "/telegram",
@@ -43,7 +46,7 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       id: "discord",
       name: "Discord",
       description: "Create bots for Discord servers and communities",
-      features: ["Voice", "Text", "Roles"], // Add relevant features
+      features: ["Voice", "Text", "Roles"],
       status: "Active",
       logo: disnew,
       link: "/discord",
@@ -52,7 +55,7 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
       id: "subspace",
       name: "Subspace",
       description: "Build on the subspace decentralized Network",
-      features: ["Decentralized", "Blockchain"], // Add relevant features
+      features: ["Decentralized", "Blockchain"],
       status: "Beta",
       logo: subnew,
       link: "/subspace",
@@ -64,91 +67,71 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
     setShowPopup(true)
   }
 
-  const handleSaveClick = () => {
-    const randomLinks = [
-      "https://example.com/random1",
-      "https://example.com/random2",
-      "https://example.com/random3",
-      "https://github.com",
-      "https://vercel.com",
-    ]
-    const randomLink = randomLinks[Math.floor(Math.random() * randomLinks.length)]
-    window.open(randomLink, "_blank")
-  }
-
-  const handleCopyCode = async (provider) => {
-    const codeSnippet = provider === "discord" ? `!link ${serverId}` : `/link ${serverId}`;
+  const handleCopyCode = async (provider: string) => {
+    const codeSnippet = provider === "discord" ? `!link ${serverId}` : `/link ${serverId}`
 
     try {
       await navigator.clipboard.writeText(codeSnippet)
-      toast.success("Code copied to clipboard!")
+      toast.success("Command copied to clipboard!")
     } catch (err) {
-      toast.error("Failed to copy code")
+      toast.error("Failed to copy command")
     }
   }
 
   return (
     <>
       <div className="bg-black h-full flex flex-col p-6">
-        <h2 className="text-3xl font-semibold text-zinc-500 mb-6">
-  Select Platform
-</h2>
+        <h2 className="text-3xl font-semibold text-zinc-500 mb-6">Select Platform</h2>
 
         {/* Platform Cards */}
-<div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 flex-1">
-
-  {platforms.map((platform) => (
-    <div
-      key={platform.id}
-      onClick={() => {
-        if (platform.id !== "subspace") {
-          handlePlatformClick(platform)
-        }
-      }}
-      className="relative p-6 rounded-xl flex-1 cursor-pointer border border-zinc-800 transition-all duration-200 
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 flex-1">
+          {platforms.map((platform) => (
+            <div
+              key={platform.id}
+              onClick={() => {
+                if (platform.id !== "subspace") {
+                  handlePlatformClick(platform)
+                }
+              }}
+              className="relative p-6 rounded-xl flex-1 cursor-pointer border border-zinc-800 transition-all duration-200 
                 flex flex-col items-center justify-center text-center w-full
                 bg-gradient-to-b from-zinc-950 to-zinc-900 hover:border-zinc-700"
-    >
-      {platform.id === "subspace" && (
-        <div className="absolute inset-0 rounded-xl flex items-center justify-center z-10 pointer-events-none">
-          <div className="bg-gradient-to-r from-zinc-800/80 to-zinc-700/80 text-white 
+            >
+              {platform.id === "subspace" && (
+                <div className="absolute inset-0 rounded-xl flex items-center justify-center z-10 pointer-events-none">
+                  <div className="bg-gradient-to-r from-zinc-800/80 to-zinc-700/80 text-white 
                           text-2xl font-bold px-16 py-5 transform rotate-12 
                           shadow-xl border border-zinc-600 rounded-lg backdrop-blur-[2px]">
-            COMING SOON
-          </div>
-        </div>
-      )}
-      <div className={platform.id === "subspace" ? "blur-[1px]" : ""}>
-        {/* Logo */}
-        <div className="flex justify-center mb-4">
-          <img
-            src={platform.logo || "/placeholder.svg"}
-            alt={`${platform.name} logo`}
-            className="w-20 h-20 object-contain" // ✅ larger icons
-          />
-        </div>
-          {/* Name */}
-          <h3 className="font-semibold text-white text-2xl mb-2">{platform.name}</h3>
-          {/* Description */}
-          <p className="text-zinc-400 text-lg mb-4">{platform.description}</p>
-        {/* Button */}
-        <Button
-        onClick={() => {
-          if (platform.id !== "subspace") {
-            handlePlatformClick(platform)
-          }
-        }}
-        disabled={platform.id === "subspace"} 
-        className={`w-full border border-zinc-500 bg-zinc-950 text-zinc-500 font-medium py-2 mt-6 rounded-lg 
+                    COMING SOON
+                  </div>
+                </div>
+              )}
+              <div className={platform.id === "subspace" ? "blur-[1px]" : ""}>
+                <div className="flex justify-center mb-4">
+                  <img
+                    src={platform.logo || "/placeholder.svg"}
+                    alt={`${platform.name} logo`}
+                    className="w-20 h-20 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-white text-2xl mb-2">{platform.name}</h3>
+                <p className="text-zinc-400 text-lg mb-4">{platform.description}</p>
+                <Button
+                  onClick={() => {
+                    if (platform.id !== "subspace") {
+                      handlePlatformClick(platform)
+                    }
+                  }}
+                  disabled={platform.id === "subspace"}
+                  className={`w-full border border-zinc-500 bg-zinc-950 text-zinc-500 font-medium py-2 mt-6 rounded-lg 
           ${platform.id === "subspace" ? "opacity-50 cursor-not-allowed" : "hover:bg-zinc-800"}`}
-      >
-        {platform.id === "Telegram" ? "Add to Community" : "Add to Server"}
-      </Button>
-
-      </div>
-    </div>
-  ))}
-</div>
+                >
+                  {platform.id === "Telegram" ? "Add to Community" : "Add to Server"}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Popup Modal */}
@@ -192,12 +175,28 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
                   <div className="space-y-6 text-left">
                     <h3 className="text-xl font-semibold text-white">Step 1: Deploy Bot</h3>
                     <p className="text-zinc-400 leading-relaxed">
-                      Connect your {selectedPlatform.name} Server to start using Lumio and managing your community.
+                      Add Lumio bot to your {selectedPlatform.name} Server to start using Lumio and managing your community.
                       {selectedPlatform.name === "Telegram" && (
                         <p className="mt-2 text-zinc-300">
-                          <b>Note:</b> Promote the bot to Admin. Go to members list → right click on "Lumio" → Promote
+                          <b>Bot username: @LumioModBot</b> <br />
+                          <br />
+                          <b>Note: </b> Promote the bot to Admin. Go to members list → right click on "Lumio" → Promote
                           to Admin and enable all permissions.
                         </p>
+                      )}
+                      {selectedPlatform.name === "Discord" && (
+                        <div className="mt-2 text-zinc-300 flex items-center gap-2">
+                          <b>Bot link: </b>
+                          <a
+                            href={DISCORD_BOT_INVITE_LINK}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-zinc-400 hover:text-white transition-colors"
+                            aria-label="Add bot to Discord server"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </div>
                       )}
                     </p>
                   </div>
@@ -208,37 +207,22 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
                     <p className="text-zinc-400 leading-relaxed">
                       Paste this command in your chat to link your server with Lumio.
                     </p>
-                    <div className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-6 overflow-x-auto w-full">
-                      <pre className="text-sm text-zinc-300 font-mono whitespace-pre-wrap leading-relaxed text-left">
-                        {selectedPlatform.name === "Telegram" && (
-                           <code>{`/link ${serverId}`}</code>
-                        )} 
-                        {selectedPlatform.name === "Discord" && (
-                           <code>{`!link ${serverId}`}</code>
-                        )} 
+                    <div className="flex items-center justify-between bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3">
+                      <pre className="text-sm text-zinc-300 font-mono">
+                        <code>
+                          {selectedPlatform.name === "Telegram" ? `/link ${serverId}` : `!link ${serverId}`}
+                        </code>
                       </pre>
+                      <button
+                        onClick={() => handleCopyCode(selectedPlatform.name.toLowerCase())}
+                        className="text-zinc-400 hover:text-white transition-colors"
+                        aria-label="Copy command"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-
-                  {/* Buttons */}
-                  <div className="col-span-1 md:col-span-2 flex gap-4 mt-6">
-                    <Button
-                      onClick={handleSaveClick}
-                      className="flex-1 bg-white text-black hover:bg-zinc-200 font-medium py-3 cursor-pointer"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Save & Connect
-                    </Button>
-                    <Button
-                      onClick={() => handleCopyCode(selectedPlatform.name.toLowerCase())}
-                      className="flex-1 bg-white text-black hover:bg-zinc-200 font-medium py-3 cursor-pointer"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Copy Code
-                    </Button>
-                  </div>
                 </CardContent>
-
               </Card>
             </motion.div>
           </motion.div>

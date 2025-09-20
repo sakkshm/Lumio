@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router-dom"
 
-const SERVERS_API_URL = `https://readily-certain-ant.ngrok-free.app/server`
+const SERVERS_API_URL = `http://localhost:3000/server`
 
 export default function CommunityAssistant() {
   const [personaPrompt, setPersonaPrompt] = useState("")

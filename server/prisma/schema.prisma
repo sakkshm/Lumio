@@ -54,3 +54,12 @@ model TelegramServer {
 
   server    Server   @relation("TelegramRelation", fields: [serverID], references: [serverID])
 }
+
+model Poll {
+  id        String   @id @default(cuid())
+  serverID  String
+  walletID  String
+  question  String
+  options   String[] // array of strings
+  createdAt DateTime @default(now())
+}

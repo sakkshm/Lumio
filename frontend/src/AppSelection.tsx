@@ -27,8 +27,20 @@ export default function Dashboard() {
   const address = useActiveAddress()
 
   const [activeTab, setActiveTab] = useState("bot-selection")
-  const [activeSubTab, setActiveSubTab] = useState("Leaderboard")
+  const [activeSubTab, setActiveSubTab] = useState("Onboarding")
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  // Define the Poll type if not already imported
+  type Poll = {
+    id: string
+    question: string
+    options: string[]
+    votes: number[]
+    createdAt: string
+    // Add other fields as needed
+  }
+  const [polls, setPolls] = useState<Poll[]>([])
+const [isDialogOpen, setIsDialogOpen] = useState(false)
+
 
   const shortenAddress = (addr: string | undefined) => {
     if (!addr) return ""
@@ -46,7 +58,6 @@ export default function Dashboard() {
       subItems: [
         "Onboarding",
         "Polls",
-        "Leaderboard",
         "Announcements",
       ],
     },
@@ -63,7 +74,16 @@ export default function Dashboard() {
       case "assistant":
         return <CommunityAssistant />
       case "engagement":
-        return <CommunityEngagement activeSection={activeSubTab} />
+  return (
+    <CommunityEngagement
+      activeSection={activeSubTab}
+      polls={polls}
+      setPolls={setPolls}
+      isDialogOpen={isDialogOpen}
+      setIsDialogOpen={setIsDialogOpen}
+    />
+  )
+
       case "analytics":
         return <Analytics />
       case "logs":
@@ -190,11 +210,22 @@ export default function Dashboard() {
   <main className="w-full h-full bg-black rounded-2xl border border-zinc-800 p-8 shadow-xl flex flex-col">
     {/* Header */}
     <header className="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
-      <h2 className="text-2xl font-semibold tracking-tight">
-        {getActiveTabLabel()}
-        {activeTab === "engagement" ? ` / ${activeSubTab}` : ""}
-      </h2>
-    </header>
+  <h2 className="text-2xl font-semibold tracking-tight">
+    {getActiveTabLabel()}
+    {activeTab === "engagement" ? ` / ${activeSubTab}` : ""}
+  </h2>
+
+  {/* Show "Make a Poll" only on Polls tab */}
+  {activeTab === "engagement" && activeSubTab === "Polls" && (
+  <Button
+    onClick={() => setIsDialogOpen(true)}
+    className="px-6 py-2 bg-white text-black rounded-lg hover:bg-zinc-200 transition-colors font-medium cursor-pointer"
+  >
+    Make a Poll
+  </Button>
+)}
+
+</header>
     {/* Content takes all remaining height */}
     <div className="flex-1 overflow-hidden">{renderContent()}</div>
   </main>

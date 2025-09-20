@@ -1,8 +1,8 @@
 import express, { type Request, type Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { setModerationConfig } from "../ao/connect.js";
-import { getDiscordMemberCount } from "../discord/discord.js";
-import { getTelegramMemberCount } from "../telegram/telegram.js";
+import { getDiscordMemberCount, launchDiscordAnnouncement, launchDiscordPoll } from "../discord/discord.js";
+import { getTelegramMemberCount, launchTelegramAnnouncement, launchTelegramPoll } from "../telegram/telegram.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -249,6 +249,110 @@ router.post("/get-analytics", async (req: Request, res: Response) => {
         })
     }
 });
+
+// --- POST /post-poll ---
+router.post("/post-poll", async (req: Request, res: Response) => {
+  const { serverID, walletID, question, options } = req.body;
+
+  // Validation
+  if (!question?.trim()) {
+    return res.status(400).json({ msg: "Poll question cannot be empty." });
+  }
+
+  if (!Array.isArray(options) || options.length < 2) {
+    return res.status(400).json({ msg: "Poll must have at least 2 options." });
+  }
+
+  if (options.length > 10) {
+    return res.status(400).json({ msg: "Poll supports a maximum of 10 options." });
+  }
+
+  try {
+    // Save poll to DB
+    const poll = await prisma.poll.create({
+      data: {
+        serverID,
+        walletID,
+        question,
+        options,
+      },
+    });
+
+    // Fetch server info for posting to Telegram/Discord
+    const server = await prisma.server.findFirst({
+      where: { serverID, walletID },
+      include: { telegramInfo: true, discordInfo: true },
+    });
+
+    if (server?.telegramInfo?.chatID) {
+      await launchTelegramPoll(server.telegramInfo.chatID, question, options);
+    }
+
+    if (server?.discordInfo?.guildID) {
+      await launchDiscordPoll(server.discordInfo.guildID, question, options);
+    }
+
+    res.status(200).json({ msg: "Poll posted successfully", poll });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Failed to post poll" });
+  }
+});
+
+// --- POST /get-polls ---
+router.post("/get-polls", async (req: Request, res: Response) => {
+  const { serverID, walletID } = req.body;
+
+  if (!serverID || !walletID) {
+    return res.status(400).json({ msg: "serverID and walletID required." });
+  }
+
+  try {
+    const polls = await prisma.poll.findMany({
+      where: { serverID, walletID },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.status(200).json({ polls });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Failed to fetch polls" });
+  }
+});
+
+
+router.post("/make-announcement", async (req: Request, res: Response) => {
+  const { serverID, walletID, message } = req.body
+
+  if (!serverID || !walletID || !message?.trim()) {
+    return res.status(400).json({ msg: "serverID, walletID, and message are required" })
+  }
+
+  try {
+    const server = await prisma.server.findFirst({
+      where: { serverID, walletID },
+      include: { discordInfo: true, telegramInfo: true },
+    })
+
+    if (!server) throw new Error("Server not found")
+
+    // --- Send to Discord ---
+    if (server.discordInfo?.guildID) {
+      await launchDiscordAnnouncement(server.discordInfo.guildID, message)
+    }
+
+    // --- Send to Telegram ---
+    if (server.telegramInfo?.chatID) {
+      await launchTelegramAnnouncement(parseInt(server.telegramInfo.chatID), message)
+    }
+
+    return res.status(200).json({ msg: "Announcement sent successfully" })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ msg: "Failed to send announcement" })
+  }
+})
+
 
 
 export default router;

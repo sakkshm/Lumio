@@ -15,6 +15,13 @@ if (!process.env.TELEGRAM_BOT_TOKEN) {
 const bot: Telegraf = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
 // ===============================
+// Utility: Escape MarkdownV2
+// ===============================
+function escapeMarkdownV2(text: string) {
+  return text.replace(/[_*[\]()~`>#+-=|{}.!]/g, "\\$&");
+}
+
+// ===============================
 // /link Command
 // ===============================
 bot.command("link", async (ctx) => {
@@ -37,30 +44,13 @@ bot.command("link", async (ctx) => {
   const chatId = ctx.chat.id.toString();
 
   try {
-    // Check if server exists in parent table
-    const server = await prisma.server.findUnique({
-      where: { serverID: serverID },
-    });
+    const server = await prisma.server.findUnique({ where: { serverID } });
+    if (!server) return ctx.reply("Invalid code: No matching server found.");
 
-    if (!server) {
-      return ctx.reply("Invalid code: No matching server found in Lumio.");
-    }
-
-    // Create TelegramServer and link to existing Server
     await prisma.telegramServer.upsert({
       where: { chatID: chatId },
-      update: { 
-        chatID: chatId,
-        server: {
-          connect: { serverID: serverID }
-        }  
-      },
-      create: {
-        chatID: chatId,
-        server: {
-          connect: { serverID: serverID },
-        },
-      },
+      update: { chatID: chatId, server: { connect: { serverID } } },
+      create: { chatID: chatId, server: { connect: { serverID } } },
     });
 
     await ctx.reply("Your server is now linked to Lumio!");
@@ -74,26 +64,20 @@ bot.command("link", async (ctx) => {
 // Ask Command
 // ===============================
 bot.command("ask", async (ctx) => {
-  const chatId = ctx.chat.id
-  const userPrompt = ctx.message.text;
+  const chatId = ctx.chat.id;
+  const userPrompt = ctx.message.text.split(" ").slice(1).join(" ");
 
   if (!userPrompt) {
-    return bot.telegram.sendMessage(chatId, "Please provide a question after /ask")
+    return bot.telegram.sendMessage(chatId, "Please provide a question after /ask");
   }
 
   try {
-    //Send typing action
-    await ctx.telegram.sendChatAction(ctx.chat.id, "typing");
+    await ctx.telegram.sendChatAction(chatId, "typing");
 
     const serverData = await prisma.server.findFirst({
-      where: {
-        telegramInfo: {
-          chatID: String(chatId),
-        },
-      },
-    })
+      where: { telegramInfo: { chatID: String(chatId) } },
+    });
 
-    // Call Groq API
     const response = await fetch(GROQ_API_URL!, {
       method: "POST",
       headers: {
@@ -105,59 +89,42 @@ bot.command("ask", async (ctx) => {
         messages: [
           {
             role: "system",
-            "content": "You are an AI assistant combining official documentation, community knowledge, and your own reasoning. Keep responses concise and plaintext only unless the user asks for detailed explanations.\n\nRules:\n- Be clear, concise, and technically accurate.\n- Act like a mentor; explain step-by-step only if asked.\n- Use community docs first; reason only if necessary.\n- Give examples or code snippets only if requested.\n- Never hallucinate APIs or facts.\n- Ask clarifying questions if the user query is ambiguous.\n\nResponse style:\n- Direct answer first, followed by optional context only if requested.\n- Keep all responses plaintext; no markdown or formatting unless user asks.\n\nGoal:\n- Provide clear, structured, and correct answers that help users solve problems while staying concise."
+            content: "You are an AI assistant combining official documentation, community knowledge, and your own reasoning. Keep responses concise and plaintext only unless the user asks for detailed explanations.\n\nRules:\n- Be clear, concise, and technically accurate.\n- Act like a mentor; explain step-by-step only if asked.\n- Use community docs first; reason only if necessary.\n- Give examples or code snippets only if requested.\n- Never hallucinate APIs or facts.\n- Ask clarifying questions if the user query is ambiguous.\n\nResponse style:\n- Direct answer first, followed by optional context only if requested.\n- Keep all responses plaintext; no markdown or formatting unless user asks.\n\nGoal:\n- Provide clear, structured, and correct answers that help users solve problems while staying concise."
           },
           { role: "system", content: serverData?.personaPrompt || "" },
           { role: "system", content: serverData?.docsPrompt || "" },
           { role: "user", content: userPrompt },
         ],
       }),
-    })
+    });
 
-    if(!response.ok){
-      throw new Error("Unable to generate response");
-    }
+    if (!response.ok) throw new Error("Unable to generate response");
 
-    const data: any = await response.json()
-
-    const replyText = data?.choices?.[0]?.message?.content || "No response generated."
-    await ctx.reply(replyText, { parse_mode: "Markdown" })
+    const data: any = await response.json();
+    const replyText = data?.choices?.[0]?.message?.content || "No response generated.";
+    await ctx.reply(replyText, { parse_mode: "Markdown" });
   } catch (e) {
-    console.error(e)
-    await ctx.reply("Unable to generate a response!")
+    console.error(e);
+    await ctx.reply("Unable to generate a response!");
   }
 });
-
 
 // ===============================
 // Text Moderation
 // ===============================
 bot.on("text", async (ctx) => {
-
   prisma.telegramServer.update({
     where: { chatID: ctx.chat.id.toString() },
     data: { messageCount: { increment: 1 } }
-  }).catch(err => {
-    console.error("Failed to increment message count:", err);
+  }).catch(console.error);
+
+  const serverData = await prisma.server.findFirst({
+    where: { telegramInfo: { is: { chatID: ctx.chat.id.toString() } } },
   });
 
-
-  console.log("Sending for moderation: " + ctx.message.text);
-
-  //get serverid
-  const resposne = await prisma.server.findFirst({
-    where: {
-      telegramInfo: {
-        is: {
-          chatID: ctx.chat.id.toString()
-        }
-      }
-    }
-  })
-
-  if(resposne){
+  if (serverData) {
     sendMessageforModeration(
-      resposne?.serverID,
+      serverData.serverID,
       ctx.chat.id.toString(),
       ctx.from.id.toString(),
       ctx.message.message_id.toString(),
@@ -165,7 +132,6 @@ bot.on("text", async (ctx) => {
       "telegram"
     );
   }
-
 });
 
 // ===============================
@@ -179,48 +145,71 @@ export async function handleTelegramMessageModerationResult(
   chatMessageId: string,
   messageText: string
 ) {
-  const messageElements = message.split("|");
-
-  const decision = messageElements[0]?.trim();
-  const reason = messageElements[1]?.trim();
+  const [decision, reason] = message.split("|").map(s => s.trim());
 
   if (decision !== "allow") {
-    const date = new Date();
-    const currentTimestamp = Math.floor(date.getTime() / 1000);
+    const currentTimestamp = Math.floor(Date.now() / 1000);
 
     try {
-      await bot.telegram.deleteMessage(
+      await bot.telegram.deleteMessage(chatId, parseInt(chatMessageId));
+      await bot.telegram.banChatMember(chatId, parseInt(userId), currentTimestamp + 100000);
+
+      const bannedUser = await bot.telegram.getChatMember(chatId, parseInt(userId));
+      await bot.telegram.sendMessage(
         chatId,
-        parseInt(chatMessageId)
-      )
-
-      await bot.telegram.banChatMember(
-        chatId,
-        parseInt(userId),
-        currentTimestamp + 100000
-      ).then(async () => {
-        const bannedUser = await bot.telegram.getChatMember(
-          chatId,
-          parseInt(userId)
-        );
-
-        await bot.telegram.sendMessage(
-          chatId,
-          "Banned: " +
-            bannedUser.user.first_name +
-            "\nReason: " +
-            (reason || "Policy violation")
-        );
-      })
-      .catch(() => {
-        bot.telegram.sendMessage(chatId, "Cannot ban Admin!")
-      });
-
+        `Banned: ${bannedUser.user.first_name}\nReason: ${reason || "Policy violation"}`
+      );
     } catch (error) {
       console.error("Error banning user:", error);
+      await bot.telegram.sendMessage(chatId, "Cannot ban Admin!");
     }
   }
 }
+
+// ===============================
+// Launch Poll
+// ===============================
+export async function launchTelegramPoll(
+  chatId: number | string,
+  question: string,
+  options: string[]
+) {
+  try {
+    return await bot.telegram.sendPoll(String(chatId), question, options, {
+      is_anonymous: false,
+      allows_multiple_answers: false,
+    });
+  } catch (error) {
+    console.error("Failed to launch poll:", error);
+    throw error;
+  }
+}
+
+// ===============================
+// Onboarding/Welcome Message
+// ===============================
+bot.on("new_chat_members", async (ctx) => {
+  try {
+    const chatId = ctx.chat.id.toString();
+    const serverData = await prisma.server.findFirst({
+      where: { telegramInfo: { is: { chatID: chatId } } },
+    });
+
+    if (!serverData || !serverData.onboardingMessage) return;
+
+    for (const member of ctx.message.new_chat_members) {
+      const welcomeText = escapeMarkdownV2(
+        serverData.onboardingMessage.replace("{user}", member.first_name)
+      );
+
+      await bot.telegram.sendMessage(chatId, welcomeText, {
+        parse_mode: "MarkdownV2",
+      });
+    }
+  } catch (err) {
+    console.error("Failed to send onboarding message:", err);
+  }
+});
 
 // ===============================
 // Utils
@@ -228,21 +217,22 @@ export async function handleTelegramMessageModerationResult(
 async function isAdmin(ctx: any) {
   try {
     const member = await ctx.telegram.getChatMember(ctx.chat.id, ctx.from.id);
-    const status = member.status;
-    return ["creator", "administrator"].includes(status);
+    return ["creator", "administrator"].includes(member.status);
   } catch (err) {
     console.error("Error checking admin status:", err);
     return false;
   }
 }
 
+export async function launchTelegramAnnouncement(chatID: number, message: string) {
+  await bot.telegram.sendMessage(chatID, escapeMarkdownV2(message), { parse_mode: "MarkdownV2" });
+}
+
 async function getTelegramMemberCount(chatId: number) {
-  try{
-    const memberCount = await bot.telegram.getChatMembersCount(chatId);
-    return memberCount;
-  }
-  catch(e){
-    console.error("Unable to get member count!");
+  try {
+    return await bot.telegram.getChatMembersCount(chatId);
+  } catch (e) {
+    console.error("Unable to get member count!", e);
     return 0;
   }
 }
@@ -256,4 +246,4 @@ process.once("SIGTERM", () => bot.stop("SIGTERM"));
 export {
   bot as telegram,
   getTelegramMemberCount
-}
+};

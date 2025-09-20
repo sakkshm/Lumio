@@ -85,7 +85,7 @@ function Onboarding() {
             Onboarding Setup
           </h2>
           <p className="text-zinc-400 mb-6">
-            Enter onboarding message for your community (markdown supported)
+            Enter onboarding message for your community (markdown supported), type {"{user}"} to mention new users first name.
           </p>
 
           <Textarea

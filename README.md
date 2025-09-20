@@ -9,16 +9,17 @@ It helps communities on **Discord, Telegram, and Web3 platforms** stay safe, eng
 ### 🔹 Core Features
 
 * **Chat Moderation** – Filters spam, toxic content, scams, and handles bans automatically.  
-* **Community Knowledge Agent** – RAG-based chatbot trained on docs, FAQs, and past discussions.  
-* **Analytics & Insights** – Tracks community growth, activity, and engagement.  
-
+* **Community Knowledge Agent** – RAG-based chatbot trained on docs, and FAQs.
+* **Analytics & Insights** – Tracks community growth, activity, and engagement.
+* **Engagement Tools** – Manage polls on discord, telegram etc. all from a single dashboard.
+* **Permanent Logs** – Stores moderation actions and chat history immutably on Arweave.   
+* **Onboarding & Announcements** – Welcomes new members, posts product updates, and guides users.
 ---
 
 ### 🔹 Future Goals
 
-* **Permanent Logs** – Stores moderation actions and chat history immutably on Arweave.  
-* **Engagement Tools** – Polls, bounties, XP system, stickers, and leaderboards.  
-* **Onboarding & Announcements** – Welcomes new members, posts product updates, and guides users.  
+* **Engagement Tools** – bounties, XP system, stickers, and leaderboards.  
+  
 * **Archival Agent** – Maintains a permanent community archive accessible forever.  
 
 ---

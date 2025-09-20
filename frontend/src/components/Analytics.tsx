@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
 const MEMBER_COLORS = ["#0088FE", "#00C49F"]
-const SERVERS_API_URL = `http://210.79.128.231/server`
+const SERVERS_API_URL = `https://lumio-server.sakkshm.me/server`
 
 export default function Analytics() {
   const [memberData, setMemberData] = useState([

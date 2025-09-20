@@ -7,7 +7,7 @@ import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router"
 import { Save } from "lucide-react"
 
-const SERVERS_API_URL = `http://210.79.128.231/server`
+const SERVERS_API_URL = `https://lumio-server.sakkshm.me/server`
 
 function Onboarding() {
   const [onboardingMessage, setOnboardingMessage] = useState("")

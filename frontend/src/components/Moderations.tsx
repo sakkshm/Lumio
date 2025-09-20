@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router-dom";
 
-const SERVERS_API_URL = `http://210.79.128.231/server`
+const SERVERS_API_URL = `https://lumio-server.sakkshm.me/server`
 
 export default function Moderations() {
   const [selectedLevel, setSelectedLevel] = useState<number>(1)

@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card"
 import { Network, Shield, MessageSquare, Users, BarChart3, Bell, ChevronRight, X } from "lucide-react"
 import { useNavigate } from "react-router-dom" 
 import noise from "@/components/noisy.png"
+import front from "./front.png"
 
 export default function LumioLandingPage() {
   const navigate = useNavigate()
@@ -40,7 +41,6 @@ export default function LumioLandingPage() {
             <div className="text-xl font-bold">LUMIO</div>
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">products</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">developers</a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">explore</a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">contact</a>
             </nav>
@@ -83,171 +83,22 @@ export default function LumioLandingPage() {
 
         {/* Dashboard Preview */}
         <section className="px-8 mb-20">
-  <div className="max-w-6xl mx-auto relative">
-    {/* Dashboard Container */}
-    <div className="bg-black/60 backdrop-blur-xl rounded-2xl border border-gray-400/40 shadow-2xl overflow-hidden -mt-10">
-      {/* Dashboard Header */}
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-black/50 p-6 border-r border-gray-700/40">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-7 h-7 bg-white rounded flex items-center justify-center shadow">
-              <div className="w-4 h-4 bg-black rounded-sm rotate-45"></div>
-            </div>
-            <span className="text-lg font-semibold text-white">Lumio</span>
-          </div>
+  <div className="max-w-7xl mx-auto relative -mt-10">
+    <div className="relative">
+      {/* The image itself */}
+      <img
+        src={front}
+        alt="Lumio Dashboard Preview"
+        className="w-full max-w-7xl h-[600px] object-cover rounded-2xl shadow-2xl border border-gray-400/40"
+      />
 
-          <nav className="space-y-1 text-sm">
-            <div className="flex items-center gap-3 bg-gray-800/70 text-white px-3 py-2 rounded-lg">
-              <Network className="w-4 h-4" />
-              Connectivity
-            </div>
-            <div className="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800/40 px-3 py-2 rounded-lg transition">
-              <Shield className="w-4 h-4" />
-              Moderations
-            </div>
-            <div className="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800/40 px-3 py-2 rounded-lg transition">
-              <MessageSquare className="w-4 h-4" />
-              Community Assistant
-            </div>
-            <div className="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800/40 px-3 py-2 rounded-lg transition">
-              <Users className="w-4 h-4" />
-              Community Engagement
-            </div>
-            <div className="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800/40 px-3 py-2 rounded-lg transition">
-              <BarChart3 className="w-4 h-4" />
-              Analytics
-            </div>
-          </nav>
-        </div>
+      {/* Fade effect at the bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-b from-transparent via-black/70 to-black rounded-b-2xl" />
 
-        {/* Main Content */}
-        <div className="flex-1 p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-white">Connectivity</h2>
-            <Bell className="w-5 h-5 text-gray-400" />
-          </div>
-
-          <div className="border-b border-gray-700/40 mb-6"></div>
-
-          <h3 className="text-base font-medium mb-4 text-white">Select Platform</h3>
-
-          <div className="grid grid-cols-3 gap-6">
-            {/* Discord Card */}
-            <Card className="bg-gray-800/30 border border-gray-700/30 p-5 rounded-xl shadow-lg hover:shadow-xl transition">
-              <div className="flex justify-between items-start mb-3">
-                <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow">
-                  <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
-                    <div className="w-1 h-1 bg-white rounded-full mr-0.5"></div>
-                    <div className="w-1 h-1 bg-white rounded-full"></div>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs border-gray-600 text-gray-400 bg-transparent"
-                >
-                  View Demo
-                </Button>
-              </div>
-              <h4 className="text-sm font-medium text-white mb-1">Discord</h4>
-              <p className="text-xs text-gray-400 mb-3">
-                Create bots for Discord servers and communities
-              </p>
-              <div className="space-y-1 mb-4">
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                  Slash Commands
-                  <div className="w-1 h-1 bg-green-500 rounded-full ml-auto"></div>
-                  Voice Integration
-                </div>
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                  Role Management
-                </div>
-              </div>
-              <Button className="w-full bg-black border-2 text-white hover:bg-gray-600 text-xs h-8 rounded-md">
-                Add to Server
-              </Button>
-            </Card>
-
-            {/* Telegram Card */}
-            <Card className="bg-gray-800/30 border border-gray-700/30 p-5 rounded-xl shadow-lg hover:shadow-xl transition">
-              <div className="flex justify-between items-start mb-3">
-                <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow">
-                  <div className="w-4 h-2 bg-black rotate-45 rounded-sm"></div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs border-gray-600 text-gray-400 bg-transparent"
-                >
-                  View Demo
-                </Button>
-              </div>
-              <h4 className="text-sm font-medium text-white mb-1">Telegram</h4>
-              <p className="text-xs text-gray-400 mb-3">
-                Deploy bots for Telegram messaging platform
-              </p>
-              <div className="space-y-1 mb-4">
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                  Slash Commands
-                  <div className="w-1 h-1 bg-green-500 rounded-full ml-auto"></div>
-                  Voice Integration
-                </div>
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                  Role Management
-                </div>
-              </div>
-              <Button className="w-full bg-black border-2 text-white hover:bg-gray-600 text-xs h-8 rounded-md">
-                Add to Community
-              </Button>
-            </Card>
-
-            {/* Subspace Card */}
-            <Card className="bg-gray-800/30 border border-gray-700/30 p-5 rounded-xl shadow-lg hover:shadow-xl transition">
-              <div className="flex justify-between items-start mb-3">
-                <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow">
-                  <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs border-gray-600 text-gray-400 bg-transparent"
-                >
-                  View Demo
-                </Button>
-              </div>
-              <h4 className="text-sm font-medium text-white mb-1">Subspace</h4>
-              <p className="text-xs text-gray-400 mb-3">
-                Build on the subspace decentralized Network
-              </p>
-              <div className="space-y-1 mb-4">
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                  Slash Commands
-                  <div className="w-1 h-1 bg-green-500 rounded-full ml-auto"></div>
-                  Voice Integration
-                </div>
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                  Role Management
-                </div>
-              </div>
-              <Button className="w-full bg-black border-2 text-white hover:bg-gray-600 text-xs h-8 rounded-md">
-                Add to Server
-              </Button>
-            </Card>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
+
 
 
 
@@ -406,59 +257,48 @@ export default function LumioLandingPage() {
         </section>
 
         {/* Footer */}
-        <footer className=" px-8 py-12">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-5 gap-8">
-              <div>
-                <div className="text-xl font-bold mb-6">LUMIO</div>
-                <div className="flex space-x-4">
-                  <X className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
-                  <div className="w-5 h-5 bg-gray-400 hover:bg-white cursor-pointer rounded"></div>
-                </div>
-              </div>
+<footer className="px-8 py-12">
+  <div className="max-w-6xl mx-auto">
+    <div className="grid grid-cols-4 gap-8">
+      <div>
+        <div className="text-xl font-bold mb-6">LUMIO</div>
+        
+      </div>
 
-              <div>
-                <h4 className="font-semibold mb-4">Products</h4>
-                <div className="space-y-2 text-gray-400">
-                  <div className="hover:text-white cursor-pointer">Overview</div>
-                  <div className="hover:text-white cursor-pointer">Features</div>
-                  <div className="hover:text-white cursor-pointer">Pricing</div>
-                </div>
-              </div>
+      <div>
+        <h4 className="font-semibold mb-4">Products</h4>
+        <div className="space-y-2 text-gray-400">
+          <div className="hover:text-white cursor-pointer">Overview</div>
+          <div className="hover:text-white cursor-pointer">Features</div>
+          <div className="hover:text-white cursor-pointer">Pricing</div>
+        </div>
+      </div>
 
-              <div>
-                <h4 className="font-semibold mb-4">Developers</h4>
-                <div className="space-y-2 text-gray-400">
-                  <div className="hover:text-white cursor-pointer">API</div>
-                  <div className="hover:text-white cursor-pointer">Docs</div>
-                  <div className="hover:text-white cursor-pointer">Community</div>
-                </div>
-              </div>
+      <div>
+        <h4 className="font-semibold mb-4">Company</h4>
+        <div className="space-y-2 text-gray-400">
+          <div className="hover:text-white cursor-pointer">About</div>
+          <div className="hover:text-white cursor-pointer">Careers</div>
+          <div className="hover:text-white cursor-pointer">Blog</div>
+        </div>
+      </div>
 
-              <div>
-                <h4 className="font-semibold mb-4">Company</h4>
-                <div className="space-y-2 text-gray-400">
-                  <div className="hover:text-white cursor-pointer">About</div>
-                  <div className="hover:text-white cursor-pointer">Careers</div>
-                  <div className="hover:text-white cursor-pointer">Blog</div>
-                </div>
-              </div>
+      <div>
+        <h4 className="font-semibold mb-4">Support</h4>
+        <div className="space-y-2 text-gray-400">
+          <div className="hover:text-white cursor-pointer">Help Center</div>
+          <div className="hover:text-white cursor-pointer">Contact</div>
+          <div className="hover:text-white cursor-pointer">Status</div>
+        </div>
+      </div>
+    </div>
 
-              <div>
-                <h4 className="font-semibold mb-4">Support</h4>
-                <div className="space-y-2 text-gray-400">
-                  <div className="hover:text-white cursor-pointer">Help Center</div>
-                  <div className="hover:text-white cursor-pointer">Contact</div>
-                  <div className="hover:text-white cursor-pointer">Status</div>
-                </div>
-              </div>
-            </div>
+    <div className="mt-12 pt-8 text-center text-gray-400 text-sm">
+      © 2025 Lumio AI. All rights reserved.
+    </div>
+  </div>
+</footer>
 
-            <div className="mt-12 pt-8 text-center text-gray-400 text-sm">
-              © 2024 Lumio AI. All rights reserved.
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   )

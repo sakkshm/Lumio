@@ -666,4 +666,21 @@ h1, h2, h3 {
   p, span, a {
   font-family: 'Outfit', sans-serif; /* text elements */
 }
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+/* index.css */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
 

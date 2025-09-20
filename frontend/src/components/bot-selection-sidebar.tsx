@@ -76,8 +76,8 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
     window.open(randomLink, "_blank")
   }
 
-  const handleCopyCode = async () => {
-    const codeSnippet = `/link ${serverId}`
+  const handleCopyCode = async (provider) => {
+    const codeSnippet = provider === "discord" ? `!link ${serverId}` : `/link ${serverId}`;
 
     try {
       await navigator.clipboard.writeText(codeSnippet)
@@ -210,7 +210,12 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
                     </p>
                     <div className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-6 overflow-x-auto w-full">
                       <pre className="text-sm text-zinc-300 font-mono whitespace-pre-wrap leading-relaxed text-left">
-                        <code>{`/link ${serverId}`}</code> {/* ✅ Dynamic serverId */}
+                        {selectedPlatform.name === "Telegram" && (
+                           <code>{`/link ${serverId}`}</code>
+                        )} 
+                        {selectedPlatform.name === "Discord" && (
+                           <code>{`!link ${serverId}`}</code>
+                        )} 
                       </pre>
                     </div>
                   </div>
@@ -225,7 +230,7 @@ export default function BotSelectionSidebar({ className }: BotSelectionSidebarPr
                       Save & Connect
                     </Button>
                     <Button
-                      onClick={handleCopyCode}
+                      onClick={() => handleCopyCode(selectedPlatform.name.toLowerCase())}
                       className="flex-1 bg-white text-black hover:bg-zinc-200 font-medium py-3 cursor-pointer"
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />

@@ -13,7 +13,7 @@ import { ServerCardSkeleton } from "./components/ServerCardSkeleton"
 import noise from "@/components/noisy.png"
 
 // API endpoint
-const SERVERS_API_URL = `http://localhost:3000/server`
+const SERVERS_API_URL = `http://210.79.128.231/server`
 
 // Server type definition
 interface ServerType {

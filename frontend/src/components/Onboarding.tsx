@@ -5,8 +5,9 @@ import { Settings, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router"
+import { Save } from "lucide-react"
 
-const SERVERS_API_URL = `http://localhost:3000/server`
+const SERVERS_API_URL = `http://210.79.128.231/server`
 
 function Onboarding() {
   const [onboardingMessage, setOnboardingMessage] = useState("")
@@ -68,14 +69,16 @@ function Onboarding() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-white" />
-        <span className="ml-3 text-lg">Loading...</span>
-      </div>
-    )
-  }
+if (loading) {
+  return (
+    <div className="flex items-center justify-center min-h-[70vh] w-full">
+      <Loader2 className="w-8 h-8 animate-spin text-white" />
+      <span className="ml-3 text-lg text-white">
+        Loading onboarding message...
+      </span>
+    </div>
+  )
+}
 
   return (
     <div className="space-y-6">
@@ -97,13 +100,14 @@ function Onboarding() {
         </section>
 
         <div className="flex justify-start">
-          <Button
-            onClick={handleSave}
-            className="bg-white text-black hover:bg-zinc-200 font-semibold px-8 py-2 transition-all duration-200 hover:scale-105 cursor-pointer"
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Save
-          </Button>
+<Button
+  onClick={handleSave}
+  className="bg-white text-black hover:bg-zinc-200 font-semibold px-8 py-2 transition-all duration-200 hover:scale-105 cursor-pointer"
+>
+  <Save className="w-4 h-4 mr-2" />  {/* ✅ replaced Settings with Save */}
+  Save
+</Button>
+
         </div>
       </div>
     </div>

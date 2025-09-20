@@ -1,13 +1,13 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router-dom"
 import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 const MEMBER_COLORS = ["#0088FE", "#00C49F"]
-const SERVERS_API_URL = `http://localhost:3000/server`
+const SERVERS_API_URL = `http://210.79.128.231/server`
 
 export default function Analytics() {
   const [memberData, setMemberData] = useState([
@@ -62,12 +62,15 @@ export default function Analytics() {
   }, [serverId, address])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+  return (
+    <div className="flex-1 h-full bg-black text-white flex items-center justify-center">
+      <div className="flex items-center gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-white" />
         <span className="text-lg">Loading analytics...</span>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="flex flex-col md:flex-row gap-4 p-6 bg-black">

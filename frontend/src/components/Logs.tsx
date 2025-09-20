@@ -4,7 +4,7 @@ import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router-dom"
 
-const SERVERS_API_URL = `http://localhost:3000/server`
+const SERVERS_API_URL = `http://210.79.128.231/server`
 
 type LogEntry = {
   id: string
@@ -59,22 +59,26 @@ export default function Logs() {
   }, [serverId, address])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+  return (
+    <div className="flex-1 h-full bg-black text-white flex items-center justify-center">
+      <div className="flex items-center gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
-        <span className="ml-3 text-lg">Loading logs...</span>
+        <span className="text-lg">Loading logs...</span>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
-  if (logs.length === 0) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <AlertTriangle className="w-6 h-6 mr-2 text-zinc-400" />
-        <span className="text-zinc-400">No logs found.</span>
+ if (logs.length === 0) {
+  return (
+    <div className="flex-1 h-full bg-black text-white flex items-center justify-center">
+      <div className="flex items-center gap-2 text-zinc-400">
+        <AlertTriangle className="w-6 h-6" />
+        <span>No logs found.</span>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="min-h-screen bg-black text-white font-mono">

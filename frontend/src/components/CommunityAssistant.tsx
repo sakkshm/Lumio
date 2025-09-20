@@ -1,3 +1,4 @@
+//communityAssistant.tsx
 import { useState, useEffect } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -5,8 +6,9 @@ import { FileText, Loader2, CheckCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router-dom"
+import { Save } from "lucide-react"
 
-const SERVERS_API_URL = `http://localhost:3000/server`
+const SERVERS_API_URL = `http://210.79.128.231/server`
 
 export default function CommunityAssistant() {
   const [personaPrompt, setPersonaPrompt] = useState("")
@@ -73,13 +75,16 @@ export default function CommunityAssistant() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+  return (
+    <div className="flex items-center justify-center h-full flex-1 text-white">
+      <div className="flex items-center gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
-        <span className="ml-3 text-lg">Loading...</span>
+        <span className="text-lg">Loading...</span>
       </div>
-    )
-  }
+    </div>
+  )
+}
+
 
   return (
     <div className="flex flex-col h-full">
@@ -133,7 +138,7 @@ export default function CommunityAssistant() {
             onClick={handleSave}
             className="bg-white text-black w-40 h-10 hover:bg-zinc-200 font-semibold px-10 py-3 text-lg transition-all duration-200 hover:scale-105 cursor-pointer rounded-xl"
           >
-            <CheckCircle className="w-6 h-6 mr-2" />
+            <Save className="w-4 h-4 mr-2" />
             Save
           </Button>
         </div>

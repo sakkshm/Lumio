@@ -5,8 +5,9 @@ import { Settings, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useActiveAddress } from "@arweave-wallet-kit/react"
 import { useParams } from "react-router"
+import { Save } from "lucide-react"
 
-const SERVERS_API_URL = `http://localhost:3000/server`
+const SERVERS_API_URL = `http://210.79.128.231/server`
 
 function Announcements() {
   const [message, setMessage] = useState("")
@@ -64,22 +65,22 @@ function Announcements() {
 
         <div className="flex justify-start">
           <Button
-            onClick={handleSendAnnouncement}
-            disabled={sending}
-            className="bg-white text-black hover:bg-zinc-200 font-semibold px-8 py-2 transition-all duration-200 hover:scale-105 cursor-pointer"
-          >
-            {sending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              <>
-                <Settings className="w-4 h-4 mr-2" />
-                Send
-              </>
-            )}
-          </Button>
+  onClick={handleSendAnnouncement}
+  disabled={sending}
+  className="bg-white text-black hover:bg-zinc-200 font-semibold px-8 py-2 transition-all duration-200 hover:scale-105 cursor-pointer"
+>
+  {sending ? (
+    <>
+      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+      Sending...
+    </>
+  ) : (
+    <>
+      <Save className="w-4 h-4 mr-2" />
+      Send
+    </>
+  )}
+</Button>
         </div>
       </div>
     </div>
